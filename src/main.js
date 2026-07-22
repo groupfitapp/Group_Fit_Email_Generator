@@ -1,4 +1,67 @@
 import { generateEmailHtml } from './template.js';
+import { parseRawText } from './parser.js';
+
+const PRESETS = {
+  trainer_preferences: {
+    audience: 'customer',
+    subject: 'Let top trainers come to you — Introducing Trainer Preferences!',
+    previewText: 'Set your activity, format, and trainer preferences so matching local pros can reach out directly.',
+    eyebrow: 'New Feature Announcement',
+    heading: 'Stop searching. Let top trainers find you, {SUBSCRIBER_FIRST_NAME}.',
+    lede: 'Finding your ideal fitness trainer just got effortless. Set your goals once, and let matching pros bring custom training options directly to you.',
+    bodyBlocks: 'Searching through dozens of trainer profiles to find the right fit takes time. With our brand-new Trainer Preferences feature, you no longer have to do the heavy lifting.\n\nSimply set your activity goals, preferred workout format, and trainer criteria—and certified trainers who match your profile can reach out directly with tailored session offers.',
+    gateBox: '<strong>Where to find it:</strong> Go to <strong>Account > Trainer Preferences</strong> in your Group Fit dashboard. You are always in control and can update your preferences or opt out at any time.',
+    checklist: `Select Trainer Preferences | Choose your preferred trainer gender (or select no preference).
+Choose Workout Format | Pick how you like to train: In-Person, Virtual, or Studio.
+Pick Your Favorite Activities | Select from Swimming, Boxing, Running, Strength & Conditioning, and more.
+Let Trainers Reach Out | Qualified trainers matching your exact profile can reach out with custom training options.`,
+    ctaText: 'Set My Trainer Preferences',
+    ctaUrl: 'https://portal.groupfitapp.com',
+    calloutTitle: 'Complete Control & Privacy',
+    calloutDesc: 'Your preferences are completely flexible. You can pause trainer matching or opt out anytime under your account settings.',
+    signoffHtml: 'Train strong,<br /><strong>Group Fit Team</strong>'
+  },
+  trainer_activation: {
+    audience: 'trainer',
+    subject: 'Complete your trainer profile',
+    previewText: 'Customers can only book you after your profile is complete and approved.',
+    eyebrow: 'Welcome',
+    heading: 'Finish your profile first, {SUBSCRIBER_FIRST_NAME}.',
+    lede: 'Your profile is the foundation. Once it is complete and approved, you can start sending clients to book you through Group Fit.',
+    bodyBlocks: 'Customers can only book you after your profile is complete and approved. The faster you finish the basics, the faster you can start sending clients to your booking link.',
+    gateBox: '<strong>Do this first:</strong> add a clear profile picture, complete your required details, set your service locations, add availability, and select your specializations.',
+    checklist: `Upload a clear profile picture | Use an individual face shot with good lighting. Profiles are not approved without one.
+Set service locations | Add your travel radius. If you train from your own studio or facility, add it and select the studio option.
+Add availability | Choose the days, time slots, and location options customers can actually book.
+Set specializations and pricing | Add every activity you train and set your own in-person and virtual prices.
+Add proof and personality | Certifications, additional images, and social links help customers trust your profile.`,
+    ctaText: 'Complete My Profile',
+    ctaUrl: 'https://portal.groupfitapp.com/login',
+    calloutTitle: 'Missing something?',
+    calloutDesc: 'If you do not see your specialization or certification listed, reply to this email and we can add it.',
+    signoffHtml: ''
+  }
+};
+
+function loadPreset(presetKey) {
+  const data = PRESETS[presetKey];
+  if (!data) return;
+
+  document.getElementById('audience').value = data.audience || 'customer';
+  document.getElementById('subject').value = data.subject || '';
+  document.getElementById('previewText').value = data.previewText || '';
+  document.getElementById('eyebrow').value = data.eyebrow || '';
+  document.getElementById('heading').value = data.heading || '';
+  document.getElementById('lede').value = data.lede || '';
+  document.getElementById('bodyBlocks').value = data.bodyBlocks || '';
+  document.getElementById('gateBox').value = data.gateBox || '';
+  document.getElementById('checklist').value = data.checklist || '';
+  document.getElementById('ctaText').value = data.ctaText || '';
+  document.getElementById('ctaUrl').value = data.ctaUrl || '';
+  document.getElementById('calloutTitle').value = data.calloutTitle || '';
+  document.getElementById('calloutDesc').value = data.calloutDesc || '';
+  document.getElementById('signoffHtml').value = data.signoffHtml || '';
+}
 
 function getFormData() {
   const audience = document.getElementById('audience').value;
@@ -37,44 +100,6 @@ function getFormData() {
   };
 }
 
-function updateDefaultsForAudience(audience) {
-  const isCustomer = audience === 'customer';
-  
-  if (isCustomer) {
-    document.getElementById('subject').value = "Discover top personal trainers near you";
-    document.getElementById('previewText').value = "Book local group sessions, 1-on-1 coaching, or in-home trainers with Group Fit.";
-    document.getElementById('eyebrow').value = "Welcome to Group Fit";
-    document.getElementById('heading').value = "Ready to achieve your goals, {SUBSCRIBER_FIRST_NAME}?";
-    document.getElementById('lede').value = "Browse verified trainers, studio options, and in-home coaches in your neighborhood.";
-    document.getElementById('bodyBlocks').value = "Finding the right trainer shouldn't be complicated. Group Fit connects you directly with certified local coaches for in-person, studio, or virtual sessions.";
-    document.getElementById('gateBox').value = "";
-    document.getElementById('checklist').value = "";
-    document.getElementById('ctaText').value = "Find a Trainer Now";
-    document.getElementById('ctaUrl').value = "https://groupfitapp.com";
-    document.getElementById('calloutTitle').value = "";
-    document.getElementById('calloutDesc').value = "";
-    document.getElementById('signoffHtml').value = "";
-  } else {
-    document.getElementById('subject').value = "Complete your trainer profile";
-    document.getElementById('previewText').value = "Customers can only book you after your profile is complete and approved.";
-    document.getElementById('eyebrow').value = "Welcome";
-    document.getElementById('heading').value = "Finish your profile first, {SUBSCRIBER_FIRST_NAME}.";
-    document.getElementById('lede').value = "Your profile is the foundation. Once it is complete and approved, you can start sending clients to book you through Group Fit.";
-    document.getElementById('bodyBlocks').value = "Customers can only book you after your profile is complete and approved. The faster you finish the basics, the faster you can start sending clients to your booking link.";
-    document.getElementById('gateBox').value = "<strong>Do this first:</strong> add a clear profile picture, complete your required details, set your service locations, add availability, and select your specializations.";
-    document.getElementById('checklist').value = `Upload a clear profile picture|Use an individual face shot with good lighting. Profiles are not approved without one.
-Set service locations|Add your travel radius. If you train from your own studio or facility, add it and select the studio option.
-Add availability|Choose the days, time slots, and location options customers can actually book.
-Set specializations and pricing|Add every activity you train and set your own in-person and virtual prices.
-Add proof and personality|Certifications, additional images, and social links help customers trust your profile.`;
-    document.getElementById('ctaText').value = "Complete My Profile";
-    document.getElementById('ctaUrl').value = "https://portal.groupfitapp.com/login";
-    document.getElementById('calloutTitle').value = "Missing something?";
-    document.getElementById('calloutDesc').value = "If you do not see your specialization or certification listed, reply to this email and we can add it.";
-    document.getElementById('signoffHtml').value = "";
-  }
-}
-
 function updatePreview() {
   const data = getFormData();
   const html = generateEmailHtml(data);
@@ -94,10 +119,48 @@ function updatePreview() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Load Trainer Preferences Announcement preset by default
+  loadPreset('trainer_preferences');
+
+  const presetSelect = document.getElementById('preset-loader');
+  if (presetSelect) {
+    presetSelect.addEventListener('change', (e) => {
+      if (e.target.value !== 'custom') {
+        loadPreset(e.target.value);
+        updatePreview();
+      }
+    });
+  }
+
   const audienceSelect = document.getElementById('audience');
   if (audienceSelect) {
-    audienceSelect.addEventListener('change', (e) => {
-      updateDefaultsForAudience(e.target.value);
+    audienceSelect.addEventListener('change', () => {
+      updatePreview();
+    });
+  }
+
+  const btnImportRaw = document.getElementById('btn-import-raw');
+  const rawInput = document.getElementById('rawTextInput');
+  if (btnImportRaw && rawInput) {
+    btnImportRaw.addEventListener('click', () => {
+      const parsed = parseRawText(rawInput.value);
+      if (parsed.audience) document.getElementById('audience').value = parsed.audience;
+      if (parsed.subject) document.getElementById('subject').value = parsed.subject;
+      if (parsed.previewText) document.getElementById('previewText').value = parsed.previewText;
+      if (parsed.eyebrow) document.getElementById('eyebrow').value = parsed.eyebrow;
+      if (parsed.heading) document.getElementById('heading').value = parsed.heading;
+      if (parsed.lede) document.getElementById('lede').value = parsed.lede;
+      if (parsed.bodyBlocks && parsed.bodyBlocks[0]) document.getElementById('bodyBlocks').value = parsed.bodyBlocks[0];
+      if (parsed.gateBox) document.getElementById('gateBox').value = parsed.gateBox;
+      if (parsed.checklist && parsed.checklist.length > 0) {
+        document.getElementById('checklist').value = parsed.checklist.map(c => `${c.title} | ${c.desc}`).join('\n');
+      }
+      if (parsed.ctaText) document.getElementById('ctaText').value = parsed.ctaText;
+      if (parsed.ctaUrl) document.getElementById('ctaUrl').value = parsed.ctaUrl;
+      if (parsed.calloutBox?.title) document.getElementById('calloutTitle').value = parsed.calloutBox.title;
+      if (parsed.calloutBox?.desc) document.getElementById('calloutDesc').value = parsed.calloutBox.desc;
+      if (parsed.signoffHtml) document.getElementById('signoffHtml').value = parsed.signoffHtml;
+      
       updatePreview();
     });
   }

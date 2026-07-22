@@ -28,79 +28,84 @@
         <h2 class="panel-title">Email Configuration</h2>
 
         <div class="form-group">
+          <label>Load Preset Email</label>
+          <select id="preset-loader" class="form-control">
+            <option value="trainer_preferences" selected>Trainer Preferences Announcement (Customer)</option>
+            <option value="trainer_activation">Trainer Profile Activation Sequence (Trainer)</option>
+            <option value="custom">Custom Email</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label>Target Audience</label>
           <select id="audience" class="form-control">
-            <option value="trainer" selected>Trainer Email (groupfitapp.com/trainer)</option>
-            <option value="customer">Customer Email (groupfitapp.com + App Store Badges)</option>
+            <option value="customer" selected>Customer Email (groupfitapp.com + App Store Badges)</option>
+            <option value="trainer">Trainer Email (groupfitapp.com/trainer)</option>
           </select>
         </div>
 
         <div class="form-group">
           <label>Subject Line</label>
-          <input type="text" id="subject" class="form-control" value="Complete your trainer profile" />
+          <input type="text" id="subject" class="form-control" />
         </div>
 
         <div class="form-group">
           <label>Preview Text</label>
-          <input type="text" id="previewText" class="form-control" value="Customers can only book you after your profile is complete and approved." />
+          <input type="text" id="previewText" class="form-control" />
         </div>
 
         <div class="form-group">
           <label>Eyebrow Badge</label>
-          <input type="text" id="eyebrow" class="form-control" value="Welcome" />
+          <input type="text" id="eyebrow" class="form-control" />
         </div>
 
         <div class="form-group">
           <label>Main Heading (H1)</label>
-          <input type="text" id="heading" class="form-control" value="Finish your profile first, {SUBSCRIBER_FIRST_NAME}." />
+          <input type="text" id="heading" class="form-control" />
         </div>
 
         <div class="form-group">
           <label>Lede Subtitle</label>
-          <textarea id="lede" class="form-control">Your profile is the foundation. Once it is complete and approved, you can start sending clients to book you through Group Fit.</textarea>
+          <textarea id="lede" class="form-control"></textarea>
         </div>
 
         <div class="form-group">
           <label>Body Content</label>
-          <textarea id="bodyBlocks" class="form-control">Customers can only book you after your profile is complete and approved. The faster you finish the basics, the faster you can start sending clients to your booking link.</textarea>
+          <textarea id="bodyBlocks" class="form-control" rows="4"></textarea>
         </div>
 
         <div class="form-group">
           <label>Gate Box / Highlight Banner</label>
-          <textarea id="gateBox" class="form-control"><strong>Do this first:</strong> add a clear profile picture, complete your required details, set your service locations, add availability, and select your specializations.</textarea>
+          <textarea id="gateBox" class="form-control"></textarea>
         </div>
 
         <div class="form-group">
           <label>Checklist Items (Title|Desc lines)</label>
-          <textarea id="checklist" class="form-control" rows="6">Upload a clear profile picture|Use an individual face shot with good lighting. Profiles are not approved without one.
-Set service locations|Add your travel radius. If you train from your own studio or facility, add it and select the studio option.
-Add availability|Choose the days, time slots, and location options customers can actually book.
-Set specializations and pricing|Add every activity you train and set your own in-person and virtual prices.
-Add proof and personality|Certifications, additional images, and social links help customers trust your profile.</textarea>
+          <textarea id="checklist" class="form-control" rows="5"></textarea>
         </div>
 
         <div class="form-group">
           <label>CTA Button Text</label>
-          <input type="text" id="ctaText" class="form-control" value="Complete My Profile" />
+          <input type="text" id="ctaText" class="form-control" />
         </div>
 
         <div class="form-group">
           <label>CTA Button Link</label>
-          <input type="text" id="ctaUrl" class="form-control" value="https://portal.groupfitapp.com" />
+          <input type="text" id="ctaUrl" class="form-control" />
         </div>
 
         <div class="form-group">
           <label>Callout Box Title</label>
-          <input type="text" id="calloutTitle" class="form-control" value="Missing something?" />
+          <input type="text" id="calloutTitle" class="form-control" />
         </div>
 
         <div class="form-group">
           <label>Callout Box Description</label>
-          <textarea id="calloutDesc" class="form-control">If you do not see your specialization or certification listed, reply to this email and we can add it.</textarea>
+          <textarea id="calloutDesc" class="form-control"></textarea>
         </div>
 
         <div class="form-group">
-          <label>Custom Signature / Signoff (HTML allowed)</label>
+          <label>Custom Signature / Signoff</label>
           <textarea id="signoffHtml" class="form-control" placeholder="Leave empty for audience default"></textarea>
         </div>
 
@@ -111,6 +116,12 @@ Add proof and personality|Certifications, additional images, and social links he
             <option value="true">Force Show</option>
             <option value="false">Hide</option>
           </select>
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label>Paste Raw Text / Text File Importer</label>
+          <textarea id="rawTextInput" class="form-control" rows="4" placeholder="Paste raw email text file content here to auto-fill fields..."></textarea>
+          <button id="btn-import-raw" class="btn btn-secondary" style="margin-top: 6px; width: 100%; justify-content: center;">Import Raw Text into Generator</button>
         </div>
       </section>
 
