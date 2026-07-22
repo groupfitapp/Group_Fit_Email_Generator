@@ -2,34 +2,63 @@
  * Group Fit SendMails HTML Email Template Generator
  */
 
+export const APP_LINKS = {
+  customer: {
+    logoUrl: 'https://groupfitapp.com',
+    appleUrl: 'https://apps.apple.com/us/app/group-fit-book-a-trainer/id6503181635',
+    googleUrl: 'https://play.google.com/store/apps/details?id=com.newcustomer',
+    defaultSignoff: 'Train strong,<br /><strong>Group Fit Team</strong>',
+    defaultFooter: 'GroupFit Technologies Inc. You are receiving this email because you registered at groupfitapp.com.'
+  },
+  trainer: {
+    logoUrl: 'https://groupfitapp.com/trainer',
+    appleUrl: 'https://apps.apple.com/us/app/group-fit-trainer/id6499300864',
+    googleUrl: 'https://play.google.com/store/apps/details?id=com.thegroupfittrainer',
+    defaultSignoff: 'Regards,<br /><strong>Mohamed M.</strong><br /><span style="font-size: 13px; color: #7a7a8a;">Founder &amp; CEO, Group Fit</span>',
+    defaultFooter: 'GroupFit Technologies Inc. You are receiving this email because you signed up as a trainer at groupfitapp.com.'
+  }
+};
+
 export function generateEmailHtml(data = {}) {
+  const audience = data.audience === 'customer' ? 'customer' : 'trainer';
+  const defaults = APP_LINKS[audience];
+
   const {
-    subject = "Complete your trainer profile",
-    previewText = "Customers can only book you after your profile is complete and approved.",
+    subject = audience === 'trainer' ? "Complete your trainer profile" : "Welcome to Group Fit",
+    previewText = audience === 'trainer' ? "Customers can only book you after your profile is complete and approved." : "Find and book local fitness trainers near you.",
     eyebrow = "Welcome",
-    heading = "Finish your profile first, {SUBSCRIBER_FIRST_NAME}.",
-    lede = "Your profile is the foundation. Once it is complete and approved, you can start sending clients to book you through Group Fit.",
+    heading = audience === 'trainer' ? "Finish your profile first, {SUBSCRIBER_FIRST_NAME}." : "Welcome to Group Fit, {SUBSCRIBER_FIRST_NAME}!",
+    lede = audience === 'trainer' ? "Your profile is the foundation. Once it is complete and approved, you can start sending clients to book you through Group Fit." : "We are excited to help you achieve your fitness goals with top local coaches.",
     bodyBlocks = [
-      "Customers can only book you after your profile is complete and approved. The faster you finish the basics, the faster you can start sending clients to your booking link."
+      audience === 'trainer'
+        ? "Customers can only book you after your profile is complete and approved. The faster you finish the basics, the faster you can start sending clients to your booking link."
+        : "Start browsing personal trainers, studio options, and in-home fitness specialists available in your area."
     ],
-    gateBox = "<strong>Do this first:</strong> add a clear profile picture, complete your required details, set your service locations, add availability, and select your specializations.",
-    sectionLabel = "Profile setup checklist",
-    checklist = [
+    gateBox = audience === 'trainer'
+      ? "<strong>Do this first:</strong> add a clear profile picture, complete your required details, set your service locations, add availability, and select your specializations."
+      : "",
+    sectionLabel = audience === 'trainer' ? "Profile setup checklist" : "",
+    checklist = audience === 'trainer' ? [
       { title: "Upload a clear profile picture", desc: "Use an individual face shot with good lighting. Profiles are not approved without one." },
       { title: "Set service locations", desc: "Add your travel radius. If you train from your own studio or facility, add it and select the studio option." },
       { title: "Add availability", desc: "Choose the days, time slots, and location options customers can actually book." },
       { title: "Set specializations and pricing", desc: "Add every activity you train and set your own in-person and virtual prices." },
       { title: "Add proof and personality", desc: "Certifications, additional images, and social links help customers trust your profile." }
-    ],
-    ctaText = "Complete My Profile",
-    ctaUrl = "https://portal.groupfitapp.com/login",
-    calloutBox = {
+    ] : [],
+    ctaText = audience === 'trainer' ? "Complete My Profile" : "Find a Trainer",
+    ctaUrl = audience === 'trainer' ? "https://portal.groupfitapp.com/login" : "https://groupfitapp.com",
+    calloutBox = audience === 'trainer' ? {
       title: "Missing something?",
       desc: "If you do not see your specialization or certification listed, reply to this email and we can add it."
-    },
-    signoffName = "Mohamed M.",
-    signoffTitle = "Founder & CEO, Group Fit",
-    footerText = "GroupFit Technologies Inc. You are receiving this email because you signed up as a trainer at groupfitapp.com."
+    } : null,
+    showAppBadges = audience === 'customer' || data.showAppBadges === true,
+    customSignoff = data.signoffHtml || '',
+    signoffName = data.signoffName,
+    signoffTitle = data.signoffTitle,
+    footerText = data.footerText || defaults.defaultFooter,
+    logoUrl = data.logoUrl || defaults.logoUrl,
+    appleUrl = data.appleUrl || defaults.appleUrl,
+    googleUrl = data.googleUrl || defaults.googleUrl
   } = data;
 
   const eyebrowHtml = eyebrow
@@ -41,7 +70,7 @@ export function generateEmailHtml(data = {}) {
     : '';
 
   const bodyHtml = Array.isArray(bodyBlocks)
-    ? bodyBlocks.map(b => `<p class="text-block">${formatText(b)}</p>`).join('\n')
+    ? bodyBlocks.filter(Boolean).map(b => `<p class="text-block">${formatText(b)}</p>`).join('\n')
     : (bodyBlocks ? `<p class="text-block">${formatText(bodyBlocks)}</p>` : '');
 
   const gateBoxHtml = gateBox
@@ -72,12 +101,24 @@ ${checklist.map((item, idx) => `<tr>
     ? `<div class="callout-box">${calloutBox.title ? `<strong>${escapeHtml(calloutBox.title)}</strong><br />` : ''}<span class="callout-desc">${formatText(calloutBox.desc)}</span></div>`
     : '';
 
-  const signoffHtml = signoffName
-    ? `<p class="signoff">Regards,<br /><strong>${escapeHtml(signoffName)}</strong><br /><span style="font-size: 13px; color: #7a7a8a;">${escapeHtml(signoffTitle)}</span></p>`
+  let signoffHtml = '';
+  if (customSignoff) {
+    signoffHtml = `<p class="signoff">${formatText(customSignoff)}</p>`;
+  } else if (signoffName) {
+    signoffHtml = `<p class="signoff">Regards,<br /><strong>${escapeHtml(signoffName)}</strong><br /><span style="font-size: 13px; color: #7a7a8a;">${escapeHtml(signoffTitle || '')}</span></p>`;
+  } else {
+    signoffHtml = `<p class="signoff">${defaults.defaultSignoff}</p>`;
+  }
+
+  const appBadgesHtml = showAppBadges
+    ? `<div class="app-badges" style="text-align: center; margin: 24px 0 16px;">
+<a href="${escapeHtml(appleUrl)}" target="_blank" style="display: inline-block; margin: 0 6px;"><img src="https://groupfitapp.com/email-assets/app-store-badge.svg" alt="Download on the App Store" height="40" style="height: 40px; width: auto; border: 0;" /></a>
+<a href="${escapeHtml(googleUrl)}" target="_blank" style="display: inline-block; margin: 0 6px;"><img src="https://groupfitapp.com/email-assets/google-play-badge.svg" alt="Get it on Google Play" height="40" style="height: 40px; width: auto; border: 0;" /></a>
+</div>`
     : '';
 
   return `<!--
-  Group Fit Themed Email
+  Group Fit Themed Email (${audience.toUpperCase()})
   Subject: ${subject}
   Preview: ${previewText}
 -->
@@ -145,7 +186,7 @@ a { color:#dc2c36; }
 <!--[if mso]><center><table><tr><td width="600"><![endif]-->
 <div class="wrap">
 <div class="container">
-<div class="logo-block"><a href="https://portal.groupfitapp.com/login" target="_blank"><img src="https://groupfitapp.com/email-assets/logo-square.png" alt="Group Fit" /></a></div>
+<div class="logo-block"><a href="${escapeHtml(logoUrl)}" target="_blank"><img src="https://groupfitapp.com/email-assets/logo-square.png" alt="Group Fit" /></a></div>
 <div class="hero">${eyebrowHtml}
 <h1 class="h1">${escapeHtml(heading)}</h1>
 ${ledeHtml}
@@ -157,6 +198,7 @@ ${checklistHtml}
 ${ctaBtnHtml}
 ${calloutHtml}
 ${signoffHtml}
+${appBadgesHtml}
 </div>
 <div class="social"><a href="https://facebook.com/groupfit.fb" target="_blank"><img src="https://groupfitapp.com/email-assets/facebook.png" alt="Facebook" height="22" width="22" /></a> <a href="https://www.instagram.com/groupfit_app" target="_blank"><img src="https://groupfitapp.com/email-assets/instagram.png" alt="Instagram" height="22" width="22" /></a> <a href="https://www.youtube.com/@GroupFitApp" target="_blank"><img src="https://groupfitapp.com/email-assets/youtube.png" alt="YouTube" height="22" width="22" /></a> <a href="https://www.tiktok.com/@groupfit.app" target="_blank"><img src="https://groupfitapp.com/email-assets/tiktok.png" alt="TikTok" height="22" width="22" /></a> <a href="https://www.linkedin.com/company/101067588" target="_blank"><img src="https://groupfitapp.com/email-assets/linkedin.png" alt="LinkedIn" height="22" width="22" /></a></div>
 <div class="footer">${escapeHtml(footerText)}<br /><a href="{UNSUBSCRIBE_URL}">Click here to unsubscribe</a></div>
@@ -181,6 +223,5 @@ function escapeHtml(str) {
 
 function formatText(str) {
   if (!str) return '';
-  // Allow basic safe inline HTML tags if user passes <strong>, <a>, <span>, etc.
   return str;
 }

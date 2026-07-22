@@ -28,6 +28,14 @@
         <h2 class="panel-title">Email Configuration</h2>
 
         <div class="form-group">
+          <label>Target Audience</label>
+          <select id="audience" class="form-control">
+            <option value="trainer" selected>Trainer Email (groupfitapp.com/trainer)</option>
+            <option value="customer">Customer Email (groupfitapp.com + App Store Badges)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label>Subject Line</label>
           <input type="text" id="subject" class="form-control" value="Complete your trainer profile" />
         </div>
@@ -63,7 +71,7 @@
         </div>
 
         <div class="form-group">
-          <label>Checklist Items (JSON or Title|Desc lines)</label>
+          <label>Checklist Items (Title|Desc lines)</label>
           <textarea id="checklist" class="form-control" rows="6">Upload a clear profile picture|Use an individual face shot with good lighting. Profiles are not approved without one.
 Set service locations|Add your travel radius. If you train from your own studio or facility, add it and select the studio option.
 Add availability|Choose the days, time slots, and location options customers can actually book.
@@ -92,13 +100,17 @@ Add proof and personality|Certifications, additional images, and social links he
         </div>
 
         <div class="form-group">
-          <label>Signoff Name</label>
-          <input type="text" id="signoffName" class="form-control" value="Mohamed M." />
+          <label>Custom Signature / Signoff (HTML allowed)</label>
+          <textarea id="signoffHtml" class="form-control" placeholder="Leave empty for audience default"></textarea>
         </div>
 
         <div class="form-group">
-          <label>Signoff Title</label>
-          <input type="text" id="signoffTitle" class="form-control" value="Founder & CEO, Group Fit" />
+          <label>Show App Download Badges</label>
+          <select id="showAppBadges" class="form-control">
+            <option value="auto">Auto (Show for Customers)</option>
+            <option value="true">Force Show</option>
+            <option value="false">Hide</option>
+          </select>
         </div>
       </section>
 
