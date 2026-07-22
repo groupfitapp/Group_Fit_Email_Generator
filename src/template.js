@@ -14,7 +14,7 @@ export const APP_LINKS = {
     logoUrl: 'https://groupfitapp.com/trainer',
     appleUrl: 'https://apps.apple.com/us/app/group-fit-trainer/id6499300864',
     googleUrl: 'https://play.google.com/store/apps/details?id=com.thegroupfittrainer',
-    defaultSignoff: 'Train strong,<br /><strong>Group Fit Team</strong>',
+    defaultSignoff: 'Regards,<br /><strong>Mohamed M.</strong><br /><span style="font-size: 13px; color: #7a7a8a;">Founder &amp; CEO, Group Fit</span>',
     defaultFooter: 'GroupFit Technologies Inc. You are receiving this email because you signed up as a trainer at groupfitapp.com.'
   }
 };
@@ -46,7 +46,7 @@ export function generateEmailHtml(data = {}) {
       { title: "Add proof and personality", desc: "Certifications, additional images, and social links help customers trust your profile." }
     ] : [],
     ctaText = audience === 'trainer' ? "Complete My Profile" : "Find a Trainer",
-    ctaUrl = data.ctaUrl || "https://portal.groupfitapp.com",
+    ctaUrl = audience === 'trainer' ? "https://portal.groupfitapp.com/login" : "https://groupfitapp.com",
     calloutBox = audience === 'trainer' ? {
       title: "Missing something?",
       desc: "If you do not see your specialization or certification listed, reply to this email and we can add it."
@@ -70,11 +70,11 @@ export function generateEmailHtml(data = {}) {
     : '';
 
   const bodyHtml = Array.isArray(bodyBlocks)
-    ? bodyBlocks.filter(Boolean).map(b => `<p class="text-block">${formatText(b)}</p>`).join('\n')
+    ? bodyBlocks.filter(Boolean).map(b => `<p class="text-block">${formatText(b)}</p>`).join('\n\n')
     : (bodyBlocks ? `<p class="text-block">${formatText(bodyBlocks)}</p>` : '');
 
   const gateBoxHtml = gateBox
-    ? `<div class="gate-box">${formatText(gateBox)}</div>`
+    ? `\n<!-- HIGHLIGHT GATE BOX -->\n<div class="gate-box">${formatText(gateBox)}</div>`
     : '';
 
   const sectionLabelHtml = sectionLabel
@@ -82,7 +82,7 @@ export function generateEmailHtml(data = {}) {
     : '';
 
   const checklistHtml = (Array.isArray(checklist) && checklist.length > 0)
-    ? `${sectionLabelHtml}
+    ? `\n<!-- CHECKLIST SECTION -->\n${sectionLabelHtml}
 <table class="checklist" role="presentation">
 <tbody>
 ${checklist.map((item, idx) => `<tr>
@@ -94,24 +94,24 @@ ${checklist.map((item, idx) => `<tr>
     : '';
 
   const ctaBtnHtml = ctaText && ctaUrl
-    ? `<div class="btn-wrap"><a href="${escapeHtml(ctaUrl)}" class="btn" target="_blank">${escapeHtml(ctaText)}</a></div>`
+    ? `\n<!-- CTA BUTTON -->\n<div class="btn-wrap"><a href="${escapeHtml(ctaUrl)}" class="btn" target="_blank">${escapeHtml(ctaText)}</a></div>`
     : '';
 
   const calloutHtml = calloutBox && (calloutBox.title || calloutBox.desc)
-    ? `<div class="callout-box">${calloutBox.title ? `<strong>${escapeHtml(calloutBox.title)}</strong><br />` : ''}<span class="callout-desc">${formatText(calloutBox.desc)}</span></div>`
+    ? `\n<!-- CALLOUT BOX -->\n<div class="callout-box">${calloutBox.title ? `<strong>${escapeHtml(calloutBox.title)}</strong><br />` : ''}<span class="callout-desc">${formatText(calloutBox.desc)}</span></div>`
     : '';
 
   let signoffHtml = '';
   if (customSignoff) {
-    signoffHtml = `<p class="signoff">${formatText(customSignoff)}</p>`;
+    signoffHtml = `\n<!-- SIGNOFF -->\n<p class="signoff">${formatText(customSignoff)}</p>`;
   } else if (signoffName) {
-    signoffHtml = `<p class="signoff">Regards,<br /><strong>${escapeHtml(signoffName)}</strong><br /><span style="font-size: 13px; color: #7a7a8a;">${escapeHtml(signoffTitle || '')}</span></p>`;
+    signoffHtml = `\n<!-- SIGNOFF -->\n<p class="signoff">Regards,<br /><strong>${escapeHtml(signoffName)}</strong><br /><span style="font-size: 13px; color: #7a7a8a;">${escapeHtml(signoffTitle || '')}</span></p>`;
   } else {
-    signoffHtml = `<p class="signoff">${defaults.defaultSignoff}</p>`;
+    signoffHtml = `\n<!-- SIGNOFF -->\n<p class="signoff">${defaults.defaultSignoff}</p>`;
   }
 
   const appBadgesHtml = showAppBadges
-    ? `<div class="app-badges" style="text-align: center; margin: 24px 0 16px;">
+    ? `\n<!-- APP STORE / GOOGLE PLAY BADGES -->\n<div class="app-badges" style="text-align: center; margin: 24px 0 16px;">
 <a href="${escapeHtml(appleUrl)}" target="_blank" style="display: inline-block; margin: 0 6px;"><img src="https://groupfitapp.com/email-assets/app-store-badge.svg" alt="Download on the App Store" height="40" style="height: 40px; width: auto; border: 0;" /></a>
 <a href="${escapeHtml(googleUrl)}" target="_blank" style="display: inline-block; margin: 0 6px;"><img src="https://groupfitapp.com/email-assets/google-play-badge.svg" alt="Get it on Google Play" height="40" style="height: 40px; width: auto; border: 0;" /></a>
 </div>`
@@ -184,13 +184,23 @@ a { color:#dc2c36; }
 <body>
 <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">${escapeHtml(previewText)}</div>
 <!--[if mso]><center><table><tr><td width="600"><![endif]-->
+
 <div class="wrap">
 <div class="container">
-<div class="logo-block"><a href="${escapeHtml(logoUrl)}" target="_blank"><img src="https://groupfitapp.com/email-assets/logo-square.png?v=2" alt="Group Fit" /></a></div>
-<div class="hero">${eyebrowHtml}
-<h1 class="h1">${escapeHtml(heading)}</h1>
-${ledeHtml}
+
+<!-- LOGO -->
+<div class="logo-block">
+  <a href="${escapeHtml(logoUrl)}" target="_blank"><img src="https://groupfitapp.com/email-assets/logo-square.png?v=2" alt="Group Fit" /></a>
 </div>
+
+<!-- HERO -->
+<div class="hero">
+  ${eyebrowHtml}
+  <h1 class="h1">${escapeHtml(heading)}</h1>
+  ${ledeHtml}
+</div>
+
+<!-- BODY -->
 <div class="body">
 ${bodyHtml}
 ${gateBoxHtml}
@@ -200,10 +210,25 @@ ${calloutHtml}
 ${signoffHtml}
 ${appBadgesHtml}
 </div>
-<div class="social"><a href="https://facebook.com/groupfit.fb" target="_blank"><img src="https://groupfitapp.com/email-assets/facebook.png" alt="Facebook" height="22" width="22" /></a> <a href="https://www.instagram.com/groupfit_app" target="_blank"><img src="https://groupfitapp.com/email-assets/instagram.png" alt="Instagram" height="22" width="22" /></a> <a href="https://www.youtube.com/@GroupFitApp" target="_blank"><img src="https://groupfitapp.com/email-assets/youtube.png" alt="YouTube" height="22" width="22" /></a> <a href="https://www.tiktok.com/@groupfit.app" target="_blank"><img src="https://groupfitapp.com/email-assets/tiktok.png" alt="TikTok" height="22" width="22" /></a> <a href="https://www.linkedin.com/company/101067588" target="_blank"><img src="https://groupfitapp.com/email-assets/linkedin.png" alt="LinkedIn" height="22" width="22" /></a></div>
-<div class="footer">${escapeHtml(footerText)}<br /><a href="{UNSUBSCRIBE_URL}">Click here to unsubscribe</a></div>
+
+<!-- SOCIAL LINKS -->
+<div class="social">
+  <a href="https://facebook.com/groupfit.fb" target="_blank"><img src="https://groupfitapp.com/email-assets/facebook.png" alt="Facebook" height="22" width="22" /></a>
+  <a href="https://www.instagram.com/groupfit_app" target="_blank"><img src="https://groupfitapp.com/email-assets/instagram.png" alt="Instagram" height="22" width="22" /></a>
+  <a href="https://www.youtube.com/@GroupFitApp" target="_blank"><img src="https://groupfitapp.com/email-assets/youtube.png" alt="YouTube" height="22" width="22" /></a>
+  <a href="https://www.tiktok.com/@groupfit.app" target="_blank"><img src="https://groupfitapp.com/email-assets/tiktok.png" alt="TikTok" height="22" width="22" /></a>
+  <a href="https://www.linkedin.com/company/101067588" target="_blank"><img src="https://groupfitapp.com/email-assets/linkedin.png" alt="LinkedIn" height="22" width="22" /></a>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  ${escapeHtml(footerText)}<br />
+  <a href="{UNSUBSCRIBE_URL}">Click here to unsubscribe</a>
+</div>
+
 </div>
 </div>
+
 <!--[if mso]></td></tr></table></center><![endif]-->
 </body>
 </html>`;
