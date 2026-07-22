@@ -51,7 +51,7 @@ export function generateEmailHtml(data = {}) {
       title: "Missing something?",
       desc: "If you do not see your specialization or certification listed, reply to this email and we can add it."
     } : null,
-    showAppBadges = audience === 'customer' || data.showAppBadges === true,
+    showAppBadges = data.showAppBadges !== false,
     customSignoff = data.signoffHtml || '',
     signoffName = data.signoffName,
     signoffTitle = data.signoffTitle,
@@ -222,7 +222,6 @@ ${appBadgesHtml}
 
 <!-- FOOTER -->
 <div class="footer">
-  ${escapeHtml(footerText)}<br />
   <a href="{UNSUBSCRIBE_URL}">Click here to unsubscribe</a>
 </div>
 

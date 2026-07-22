@@ -1,0 +1,22 @@
+Subject: You asked for leads? You got them! 🎯
+Preview: Introducing the new Leads feature—connect with matched clients looking for your exact services today.
+Eyebrow: New Feature Announcement
+Heading: You asked for leads. You got them, {SUBSCRIBER_FIRST_NAME}!
+Lede: Finding new clients just got a whole lot easier. You can now browse matched customer leads and reach out directly from Group Fit.
+Body:
+Many of you have reached out asking for a direct way to find local clients actively looking for training—and we listened.
+
+Introducing Leads: a brand-new feature inside Group Fit designed to connect you with clients whose training goals, format preferences, and locations match your exact profile.
+GateBox:
+<strong>Where to find it:</strong> Log in to Group Fit Trainer and click on the new <strong>Leads</strong> tab. Set up your message templates and start connecting with clients today!
+Checklist:
+Create Message Templates | Save time by crafting custom, reusable templates for different activities and client goals.
+Explore "Perfect Matches" | Instantly see client leads whose specific activity, format, and trainer preferences match your profile.
+Check "Suggested Leads" | Discover 10 recommended client leads at a time to continually grow your client pipeline.
+Make Your First Message Count | You can message up to 10 new leads per day. To ensure top client response rates and quality, follow-up messages unlock once a client replies.
+CTA Text: Claim Your Leads Now
+CTA URL: https://portal.groupfitapp.com
+Callout Title: Pro Tip: Make your first impression count!
+Callout Desc: Take a moment to review each client's preferences and tailor your template before sending. High-quality, personalized outreach gets the best response rates!
+Signoff Name: Train strong,
+Signoff Title: Group Fit Team

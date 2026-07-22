@@ -2,6 +2,25 @@ import { generateEmailHtml } from './template.js';
 import { parseRawText } from './parser.js';
 
 const PRESETS = {
+  trainer_leads: {
+    audience: 'trainer',
+    subject: 'You asked for leads? You got them! 🎯',
+    previewText: 'Introducing the new Leads feature—connect with matched clients looking for your exact services today.',
+    eyebrow: 'New Feature Announcement',
+    heading: 'You asked for leads. You got them, {SUBSCRIBER_FIRST_NAME}!',
+    lede: 'Finding new clients just got a whole lot easier. You can now browse matched customer leads and reach out directly from Group Fit.',
+    bodyBlocks: 'Many of you have reached out asking for a direct way to find local clients actively looking for training—and we listened.\n\nIntroducing Leads: a brand-new feature inside Group Fit designed to connect you with clients whose training goals, format preferences, and locations match your exact profile.',
+    gateBox: '<strong>Where to find it:</strong> Log in to Group Fit Trainer and click on the new <strong>Leads</strong> tab. Set up your message templates and start connecting with clients today!',
+    checklist: `Create Message Templates | Save time by crafting custom, reusable templates for different activities and client goals.
+Explore "Perfect Matches" | Instantly see client leads whose specific activity, format, and trainer preferences match your profile.
+Check "Suggested Leads" | Discover 10 recommended client leads at a time to continually grow your client pipeline.
+Make Your First Message Count | You can message up to 10 new leads per day. To ensure top client response rates and quality, follow-up messages unlock once a client replies.`,
+    ctaText: 'Claim Your Leads Now',
+    ctaUrl: 'https://portal.groupfitapp.com',
+    calloutTitle: 'Pro Tip: Make your first impression count!',
+    calloutDesc: 'Take a moment to review each client\'s preferences and tailor your template before sending. High-quality, personalized outreach gets the best response rates!',
+    signoffHtml: 'Train strong,<br /><strong>Group Fit Team</strong>'
+  },
   trainer_preferences: {
     audience: 'customer',
     subject: 'Let top trainers come to you — Introducing Trainer Preferences!',
@@ -75,7 +94,7 @@ function getFormData() {
   }) : [];
 
   const appBadgesVal = document.getElementById('showAppBadges').value;
-  let showAppBadges = audience === 'customer';
+  let showAppBadges = true;
   if (appBadgesVal === 'true') showAppBadges = true;
   if (appBadgesVal === 'false') showAppBadges = false;
 
