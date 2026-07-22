@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Group Fit Email Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div class="brand">
+        <img src="https://groupfitapp.com/email-assets/logo-square.png" alt="Group Fit" />
+        <h1>Group Fit Email Generator</h1>
+        <span>SendMails Theme</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-view-code" class="btn btn-secondary">View HTML Code</button>
+        <button id="btn-copy-html" class="btn">Copy SendMails HTML</button>
+      </div>
+    </header>
+
+    <main class="app-container">
+      <section class="editor-panel">
+        <h2 class="panel-title">Email Configuration</h2>
+
+        <div class="form-group">
+          <label>Subject Line</label>
+          <input type="text" id="subject" class="form-control" value="Complete your trainer profile" />
+        </div>
+
+        <div class="form-group">
+          <label>Preview Text</label>
+          <input type="text" id="previewText" class="form-control" value="Customers can only book you after your profile is complete and approved." />
+        </div>
+
+        <div class="form-group">
+          <label>Eyebrow Badge</label>
+          <input type="text" id="eyebrow" class="form-control" value="Welcome" />
+        </div>
+
+        <div class="form-group">
+          <label>Main Heading (H1)</label>
+          <input type="text" id="heading" class="form-control" value="Finish your profile first, {SUBSCRIBER_FIRST_NAME}." />
+        </div>
+
+        <div class="form-group">
+          <label>Lede Subtitle</label>
+          <textarea id="lede" class="form-control">Your profile is the foundation. Once it is complete and approved, you can start sending clients to book you through Group Fit.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Body Content</label>
+          <textarea id="bodyBlocks" class="form-control">Customers can only book you after your profile is complete and approved. The faster you finish the basics, the faster you can start sending clients to your booking link.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Gate Box / Highlight Banner</label>
+          <textarea id="gateBox" class="form-control"><strong>Do this first:</strong> add a clear profile picture, complete your required details, set your service locations, add availability, and select your specializations.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Checklist Items (JSON or Title|Desc lines)</label>
+          <textarea id="checklist" class="form-control" rows="6">Upload a clear profile picture|Use an individual face shot with good lighting. Profiles are not approved without one.
+Set service locations|Add your travel radius. If you train from your own studio or facility, add it and select the studio option.
+Add availability|Choose the days, time slots, and location options customers can actually book.
+Set specializations and pricing|Add every activity you train and set your own in-person and virtual prices.
+Add proof and personality|Certifications, additional images, and social links help customers trust your profile.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>CTA Button Text</label>
+          <input type="text" id="ctaText" class="form-control" value="Complete My Profile" />
+        </div>
+
+        <div class="form-group">
+          <label>CTA Button Link</label>
+          <input type="text" id="ctaUrl" class="form-control" value="https://portal.groupfitapp.com/login" />
+        </div>
+
+        <div class="form-group">
+          <label>Callout Box Title</label>
+          <input type="text" id="calloutTitle" class="form-control" value="Missing something?" />
+        </div>
+
+        <div class="form-group">
+          <label>Callout Box Description</label>
+          <textarea id="calloutDesc" class="form-control">If you do not see your specialization or certification listed, reply to this email and we can add it.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Signoff Name</label>
+          <input type="text" id="signoffName" class="form-control" value="Mohamed M." />
+        </div>
+
+        <div class="form-group">
+          <label>Signoff Title</label>
+          <input type="text" id="signoffTitle" class="form-control" value="Founder & CEO, Group Fit" />
+        </div>
+      </section>
+
+      <section class="preview-panel">
+        <div class="preview-toolbar">
+          <div class="view-modes">
+            <button class="view-btn active" id="mode-desktop">Desktop Preview</button>
+            <button class="view-btn" id="mode-mobile">Mobile Preview</button>
+          </div>
+          <span style="color: var(--text-muted); font-size: 0.85rem;">Live SendMails Rendering</span>
+        </div>
+        <div class="preview-frame-wrap">
+          <iframe id="preview-frame" title="Email Preview"></iframe>
+        </div>
+      </section>
+    </main>
+
+    <div id="modal-code" class="code-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Generated SendMails HTML Code</h3>
+          <button id="btn-close-modal" class="btn btn-secondary">Close</button>
+        </div>
+        <div class="modal-body">
+          <textarea id="code-output" readonly></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
