@@ -1,0 +1,22 @@
+Subject: Let top trainers come to you — Introducing Trainer Preferences!
+Preview: Set your activity, format, and trainer preferences so matching local pros can reach out directly.
+Eyebrow: New Feature Announcement
+Heading: Stop searching. Let top trainers find you, {SUBSCRIBER_FIRST_NAME}.
+Lede: Finding your ideal fitness trainer just got effortless. Set your goals once, and let matching pros bring custom training options directly to you.
+Body:
+Searching through dozens of trainer profiles to find the right fit takes time. With our brand-new Trainer Preferences feature, you no longer have to do the heavy lifting.
+
+Simply set your activity goals, preferred workout format, and trainer criteria—and certified trainers who match your profile can reach out directly with tailored session offers.
+GateBox:
+<strong>Where to find it:</strong> Go to <strong>Account > Trainer Preferences</strong> in your Group Fit dashboard. You are always in control and can update your preferences or opt out at any time.
+Checklist:
+Select Trainer Preferences | Choose your preferred trainer gender (or select no preference).
+Choose Workout Format | Pick how you like to train: In-Person, Virtual, or Studio.
+Pick Your Favorite Activities | Select from Swimming, Boxing, Running, Strength & Conditioning, and more.
+Let Trainers Reach Out | Qualified trainers matching your exact profile can reach out with custom training options.
+CTA Text: Set My Trainer Preferences
+CTA URL: https://portal.groupfitapp.com
+Callout Title: Complete Control & Privacy
+Callout Desc: Your preferences are completely flexible. You can pause trainer matching or opt out anytime under your account settings.
+Signoff Name: Train strong,
+Signoff Title: Group Fit Team

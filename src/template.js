@@ -14,7 +14,7 @@ export const APP_LINKS = {
     logoUrl: 'https://groupfitapp.com/trainer',
     appleUrl: 'https://apps.apple.com/us/app/group-fit-trainer/id6499300864',
     googleUrl: 'https://play.google.com/store/apps/details?id=com.thegroupfittrainer',
-    defaultSignoff: 'Regards,<br /><strong>Mohamed M.</strong><br /><span style="font-size: 13px; color: #7a7a8a;">Founder &amp; CEO, Group Fit</span>',
+    defaultSignoff: 'Train strong,<br /><strong>Group Fit Team</strong>',
     defaultFooter: 'GroupFit Technologies Inc. You are receiving this email because you signed up as a trainer at groupfitapp.com.'
   }
 };
@@ -46,7 +46,7 @@ export function generateEmailHtml(data = {}) {
       { title: "Add proof and personality", desc: "Certifications, additional images, and social links help customers trust your profile." }
     ] : [],
     ctaText = audience === 'trainer' ? "Complete My Profile" : "Find a Trainer",
-    ctaUrl = audience === 'trainer' ? "https://portal.groupfitapp.com/login" : "https://groupfitapp.com",
+    ctaUrl = data.ctaUrl || "https://portal.groupfitapp.com",
     calloutBox = audience === 'trainer' ? {
       title: "Missing something?",
       desc: "If you do not see your specialization or certification listed, reply to this email and we can add it."
@@ -186,7 +186,7 @@ a { color:#dc2c36; }
 <!--[if mso]><center><table><tr><td width="600"><![endif]-->
 <div class="wrap">
 <div class="container">
-<div class="logo-block"><a href="${escapeHtml(logoUrl)}" target="_blank"><img src="https://groupfitapp.com/email-assets/logo-square.png" alt="Group Fit" /></a></div>
+<div class="logo-block"><a href="${escapeHtml(logoUrl)}" target="_blank"><img src="https://groupfitapp.com/email-assets/logo-square.png?v=2" alt="Group Fit" /></a></div>
 <div class="hero">${eyebrowHtml}
 <h1 class="h1">${escapeHtml(heading)}</h1>
 ${ledeHtml}

@@ -18,10 +18,10 @@ function parseInputFile(filePath) {
     gateBox: '',
     checklist: [],
     ctaText: 'Complete My Profile',
-    ctaUrl: 'https://portal.groupfitapp.com/login',
+    ctaUrl: 'https://portal.groupfitapp.com',
     calloutBox: { title: '', desc: '' },
-    signoffName: 'Mohamed M.',
-    signoffTitle: 'Founder & CEO, Group Fit'
+    signoffName: 'Train strong,',
+    signoffTitle: 'Group Fit Team'
   };
 
   const lines = content.split('\n');
