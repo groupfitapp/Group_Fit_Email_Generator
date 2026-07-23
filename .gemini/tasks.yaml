@@ -1,0 +1,38 @@
+version: "1.0"
+name: group-fit-email-generator-tasks
+tasks:
+  - name: dev-server
+    label: "Start Dev Server"
+    description: "Start the Vite development server for live browser preview"
+    command: "npm run dev"
+    cwd: "."
+    type: "shell"
+    is_background: true
+    port: 5173
+    env:
+      NODE_ENV: "development"
+
+  - name: preview-server
+    label: "Start Preview Server"
+    description: "Preview the compiled production build locally"
+    command: "npm run preview"
+    cwd: "."
+    type: "shell"
+    is_background: true
+    port: 4173
+
+  - name: build
+    label: "Build Production"
+    description: "Compile and bundle production assets to dist/"
+    command: "npm run build"
+    cwd: "."
+    type: "shell"
+    is_background: false
+
+  - name: generate-email
+    label: "Generate Email HTML from Text"
+    description: "Run CLI script to parse input text file and output HTML"
+    command: "node cli.mjs"
+    cwd: "."
+    type: "shell"
+    is_background: false

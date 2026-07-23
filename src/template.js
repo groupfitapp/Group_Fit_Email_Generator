@@ -8,19 +8,21 @@ export const APP_LINKS = {
     appleUrl: 'https://apps.apple.com/us/app/group-fit-book-a-trainer/id6503181635',
     googleUrl: 'https://play.google.com/store/apps/details?id=com.newcustomer',
     defaultSignoff: 'Train strong,<br /><strong>Group Fit Team</strong>',
-    defaultFooter: 'GroupFit Technologies Inc. You are receiving this email because you registered at groupfitapp.com.'
+    defaultFooter: 'GroupFit Technologies Inc. You are receiving this email because you registered at groupfitapp.com.',
+    defaultCtaUrl: 'https://groupfitapp.com'
   },
   trainer: {
     logoUrl: 'https://groupfitapp.com/trainer',
     appleUrl: 'https://apps.apple.com/us/app/group-fit-trainer/id6499300864',
     googleUrl: 'https://play.google.com/store/apps/details?id=com.thegroupfittrainer',
-    defaultSignoff: 'Regards,<br /><strong>Mohamed M.</strong><br /><span style="font-size: 13px; color: #7a7a8a;">Founder &amp; CEO, Group Fit</span>',
-    defaultFooter: 'GroupFit Technologies Inc. You are receiving this email because you signed up as a trainer at groupfitapp.com.'
+    defaultSignoff: 'Train strong,<br /><strong>Group Fit Team</strong>',
+    defaultFooter: 'GroupFit Technologies Inc. You are receiving this email because you signed up as a trainer at groupfitapp.com.',
+    defaultCtaUrl: 'https://portal.groupfitapp.com/login'
   }
 };
 
 export function generateEmailHtml(data = {}) {
-  const audience = data.audience === 'customer' ? 'customer' : 'trainer';
+  const audience = data.audience === 'trainer' ? 'trainer' : 'customer';
   const defaults = APP_LINKS[audience];
 
   const {
@@ -46,12 +48,11 @@ export function generateEmailHtml(data = {}) {
       { title: "Add proof and personality", desc: "Certifications, additional images, and social links help customers trust your profile." }
     ] : [],
     ctaText = audience === 'trainer' ? "Complete My Profile" : "Find a Trainer",
-    ctaUrl = audience === 'trainer' ? "https://portal.groupfitapp.com/login" : "https://groupfitapp.com",
-    calloutBox = audience === 'trainer' ? {
+    ctaUrl = data.ctaUrl || defaults.defaultCtaUrl,
+    calloutBox = data.calloutBox || (audience === 'trainer' ? {
       title: "Missing something?",
       desc: "If you do not see your specialization or certification listed, reply to this email and we can add it."
-    } : null,
-    showAppBadges = data.showAppBadges !== false,
+    } : null),
     customSignoff = data.signoffHtml || '',
     signoffName = data.signoffName,
     signoffTitle = data.signoffTitle,
@@ -60,6 +61,9 @@ export function generateEmailHtml(data = {}) {
     appleUrl = data.appleUrl || defaults.appleUrl,
     googleUrl = data.googleUrl || defaults.googleUrl
   } = data;
+
+  // Show App Badges by default for both Customer (Customer App) and Trainer (Trainer App)
+  const showAppBadges = data.showAppBadges !== false;
 
   const eyebrowHtml = eyebrow
     ? `<span class="eyebrow">${escapeHtml(eyebrow)}</span>`
@@ -111,7 +115,7 @@ ${checklist.map((item, idx) => `<tr>
   }
 
   const appBadgesHtml = showAppBadges
-    ? `\n<!-- APP STORE / GOOGLE PLAY BADGES -->\n<div class="app-badges" style="text-align: center; margin: 24px 0 16px;">
+    ? `\n<!-- APP STORE / GOOGLE PLAY BADGES (${audience.toUpperCase()}) -->\n<div class="app-badges" style="text-align: center; margin: 24px 0 16px;">
 <a href="${escapeHtml(appleUrl)}" target="_blank" style="display: inline-block; margin: 0 6px;"><img src="https://groupfitapp.com/email-assets/app-store-badge.svg" alt="Download on the App Store" height="40" style="height: 40px; width: auto; border: 0;" /></a>
 <a href="${escapeHtml(googleUrl)}" target="_blank" style="display: inline-block; margin: 0 6px;"><img src="https://groupfitapp.com/email-assets/google-play-badge.svg" alt="Get it on Google Play" height="40" style="height: 40px; width: auto; border: 0;" /></a>
 </div>`
@@ -235,7 +239,6 @@ ${appBadgesHtml}
 
 function escapeHtml(str) {
   if (!str) return '';
-  // Preserve template tags like {SUBSCRIBER_FIRST_NAME} and {UNSUBSCRIBE_URL}
   return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

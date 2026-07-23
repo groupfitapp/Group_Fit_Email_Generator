@@ -140,9 +140,20 @@ function openInBrowser(filePath) {
 
 async function main() {
   const args = process.argv.slice(2);
-  const inputArg = args.find(a => a.startsWith('--input='))?.split('=')[1] || args.find(a => !a.startsWith('--'));
-  const outputArg = args.find(a => a.startsWith('--output='))?.split('=')[1] || 'email.html';
+  const rawInput = args.find(a => a.startsWith('--input='))?.split('=')[1] || args.find(a => !a.startsWith('--'));
+  const rawOutput = args.find(a => a.startsWith('--output='))?.split('=')[1] || path.join('output', 'email.html');
   const noOpen = args.includes('--no-open');
+
+  let inputArg = rawInput;
+  if (inputArg && !fs.existsSync(inputArg) && fs.existsSync(path.join('inputs', inputArg))) {
+    inputArg = path.join('inputs', inputArg);
+  }
+
+  const outputArg = rawOutput;
+  const outputDir = path.dirname(outputArg);
+  if (outputDir && !fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
 
   let data = {};
   if (inputArg && fs.existsSync(inputArg)) {

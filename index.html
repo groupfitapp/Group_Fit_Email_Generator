@@ -3,143 +3,290 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Group Fit Email Generator</title>
+  <title>Group Fit Email Generator & AI Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
   <div id="app">
+    <!-- TOP NAVIGATION HEADER -->
     <header class="app-header">
       <div class="brand">
-        <img src="https://groupfitapp.com/email-assets/logo-square.png?v=2" alt="Group Fit" />
-        <h1>Group Fit Email Generator</h1>
-        <span>SendMails Theme</span>
+        <img src="https://groupfitapp.com/email-assets/logo-square.png?v=2" alt="Group Fit Logo" />
+        <div class="brand-text">
+          <h1>Group Fit Email Studio</h1>
+          <span class="badge">SendMails Builder v2.0</span>
+        </div>
       </div>
+
+      <!-- WORKFLOW TABS NAV -->
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="tab-editor">
+          <span class="tab-icon">📝</span>
+          Form Editor
+        </button>
+        <button class="nav-tab" data-tab="tab-import">
+          <span class="tab-icon">📁</span>
+          Import TXT
+        </button>
+        <button class="nav-tab" data-tab="tab-ai">
+          <span class="tab-icon">✨</span>
+          AI Generator
+        </button>
+      </nav>
+
       <div class="header-actions">
-        <button id="btn-view-code" class="btn btn-secondary">View HTML Code</button>
-        <button id="btn-copy-html" class="btn">Copy SendMails HTML</button>
+        <button id="btn-publish-assets" class="btn btn-publish" title="Upload & sync images to Group_Fit_Website repository and update HTML code">
+          <span>🚀 Publish &amp; Sync Assets</span>
+        </button>
+        <button id="btn-export-txt" class="btn btn-secondary" title="Download Formatted TXT File">
+          <span>📥 Export TXT</span>
+        </button>
+        <button id="btn-view-code" class="btn btn-secondary">
+          <span>&lt;/&gt; View Code</span>
+        </button>
+        <button id="btn-copy-html" class="btn btn-primary">
+          <span>📋 Copy HTML</span>
+        </button>
       </div>
     </header>
 
+    <!-- MAIN APP LAYOUT CONTAINER -->
     <main class="app-container">
+      
+      <!-- LEFT CONTROL PANEL WITH TABS -->
       <section class="editor-panel">
-        <h2 class="panel-title">Email Configuration</h2>
-
-        <div class="form-group">
-          <label>Load Preset Email</label>
-          <select id="preset-loader" class="form-control">
-            <option value="trainer_leads" selected>Trainer Leads Announcement (Trainer)</option>
-            <option value="trainer_preferences">Trainer Preferences Announcement (Customer)</option>
-            <option value="trainer_activation">Trainer Profile Activation Sequence (Trainer)</option>
-            <option value="custom">Custom Email</option>
-          </select>
+        
+        <!-- GLOBAL AUDIENCE SELECTOR BAR -->
+        <div class="audience-banner">
+          <div class="audience-label">
+            <span class="label-title">Target Audience</span>
+            <span class="label-desc">Sets default links, sign-offs, and app store badges</span>
+          </div>
+          <div class="audience-toggle">
+            <button class="audience-btn active" data-audience="customer">
+              <span>👤 Customer</span>
+            </button>
+            <button class="audience-btn" data-audience="trainer">
+              <span>💪 Trainer</span>
+            </button>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Target Audience</label>
-          <select id="audience" class="form-control">
-            <option value="customer" selected>Customer Email (groupfitapp.com + App Store Badges)</option>
-            <option value="trainer">Trainer Email (groupfitapp.com/trainer)</option>
-          </select>
+        <!-- TAB 1: FORM EDITOR -->
+        <div id="tab-editor" class="tab-content active">
+          <div class="section-header">
+            <h3>Email Configuration</h3>
+            <span class="subtext">Edit fields below to update the live preview</span>
+          </div>
+
+          <div class="form-group">
+            <label for="subject">Subject Line</label>
+            <input type="text" id="subject" class="form-control" placeholder="e.g. Stop searching. Let top trainers find you" />
+          </div>
+
+          <div class="form-group">
+            <label for="previewText">Preview Text (Inbox Snippet)</label>
+            <input type="text" id="previewText" class="form-control" placeholder="e.g. Set your preferences so coaches reach out directly" />
+          </div>
+
+          <div class="form-row grid-2">
+            <div class="form-group">
+              <label for="eyebrow">Eyebrow Badge</label>
+              <input type="text" id="eyebrow" class="form-control" placeholder="NEW FEATURE" />
+            </div>
+            <div class="form-group">
+              <label for="showAppBadges">App Store Badges</label>
+              <select id="showAppBadges" class="form-control">
+                <option value="auto" selected>Auto (Show for Customers)</option>
+                <option value="true">Force Show</option>
+                <option value="false">Hide</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="heading">Main Heading (H1)</label>
+            <input type="text" id="heading" class="form-control" placeholder="e.g. Stop searching. Let top trainers find you, {SUBSCRIBER_FIRST_NAME}." />
+          </div>
+
+          <div class="form-group">
+            <label for="lede">Lede Subtitle</label>
+            <textarea id="lede" class="form-control" rows="2" placeholder="Introductory paragraph line..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <div class="label-with-action">
+              <label for="bodyBlocks">Body Content (Paragraphs)</label>
+              <button id="btn-insert-image-prompt" class="btn-text-action" type="button">+ Insert Staged Image</button>
+            </div>
+            <textarea id="bodyBlocks" class="form-control" rows="4" placeholder="Main email body text..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="gateBox">Gate Box / Highlight Banner</label>
+            <textarea id="gateBox" class="form-control" rows="2" placeholder="Highlighted notice or callout banner..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="checklist">Checklist Items (Format: Title | Description)</label>
+            <textarea id="checklist" class="form-control" rows="5" placeholder="Select Trainer Preferences | Choose preferred gender&#10;Choose Workout Format | Pick In-Person or Virtual"></textarea>
+          </div>
+
+          <div class="form-row grid-2">
+            <div class="form-group">
+              <label for="ctaText">CTA Button Text</label>
+              <input type="text" id="ctaText" class="form-control" placeholder="Set My Preferences" />
+            </div>
+            <div class="form-group">
+              <label for="ctaUrl">CTA Button Link</label>
+              <input type="text" id="ctaUrl" class="form-control" placeholder="https://groupfitapp.com" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="calloutTitle">Callout Box Title</label>
+            <input type="text" id="calloutTitle" class="form-control" placeholder="Complete Control & Privacy" />
+          </div>
+
+          <div class="form-group">
+            <label for="calloutDesc">Callout Box Description</label>
+            <textarea id="calloutDesc" class="form-control" rows="2" placeholder="Your preferences are flexible and can be updated anytime..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="signoffHtml">Custom Signature / Sign-off</label>
+            <textarea id="signoffHtml" class="form-control" rows="2" placeholder="Leave empty for default audience sign-off"></textarea>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Subject Line</label>
-          <input type="text" id="subject" class="form-control" />
+        <!-- TAB 2: IMPORT TXT FILE -->
+        <div id="tab-import" class="tab-content">
+          <div class="section-header">
+            <h3>Import Formatted TXT File</h3>
+            <span class="subtext">Upload or select a formatted text file to auto-populate all email fields</span>
+          </div>
+
+          <!-- DROPZONE UPLOADER -->
+          <div id="txt-dropzone" class="dropzone">
+            <div class="dropzone-icon">📄</div>
+            <div class="dropzone-text">
+              <strong>Click to choose file</strong> or drag & drop a <code>.txt</code> file here
+            </div>
+            <input type="file" id="txt-file-input" accept=".txt" style="display: none;" />
+          </div>
+
+          <!-- RAW TEXT PASTE AREA -->
+          <div class="form-group" style="margin-top: 16px;">
+            <label for="rawTextInput">Paste Raw Text File Contents</label>
+            <textarea id="rawTextInput" class="form-control" rows="12" placeholder="Subject: ...&#10;Preview: ...&#10;Eyebrow: ...&#10;Heading: ...&#10;Body: ...&#10;Checklist:&#10;Item 1 | Description 1"></textarea>
+            <button id="btn-import-raw" class="btn btn-primary" style="margin-top: 12px; width: 100%; justify-content: center;">
+              <span>⚡ Import & Apply to Generator</span>
+            </button>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Preview Text</label>
-          <input type="text" id="previewText" class="form-control" />
+        <!-- TAB 3: AI GENERATOR (WITH GEMINI PRO / API KEY INTEGRATION & STATUS BADGE) -->
+        <div id="tab-ai" class="tab-content">
+          <div class="section-header">
+            <h3>Gemini AI Email Studio</h3>
+            <span class="subtext">Connect your Gemini API Key or ask me in chat for full Gemini Pro copy generation</span>
+          </div>
+
+          <!-- GEMINI API KEY INPUT & VISUAL STATUS BADGE -->
+          <div class="form-group" style="background: var(--bg-card); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div class="label-with-action">
+              <label for="gemini-api-key">
+                Gemini API Key 
+                <span id="api-key-status-badge" class="key-badge offline">Offline Engine</span>
+              </label>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn-text-action">Get Free Key</a>
+            </div>
+            <input type="password" id="gemini-api-key" class="form-control" placeholder="Paste AI Studio API Key here (saves instantly)..." />
+          </div>
+
+          <div class="form-group">
+            <label for="ai-prompt">What email would you like Gemini AI to write?</label>
+            <textarea id="ai-prompt" class="form-control" rows="3" placeholder="e.g. Write a highly persuasive announcement to local trainers introducing our new client matching leads feature and encouraging profile completion..."></textarea>
+          </div>
+
+          <div class="form-row grid-2">
+            <div class="form-group">
+              <label for="ai-category">Email Goal / Strategy</label>
+              <select id="ai-category" class="form-control">
+                <option value="announcement" selected>Feature Announcement</option>
+                <option value="onboarding">Onboarding / Setup</option>
+                <option value="promotion">Special Promotion</option>
+                <option value="reengagement">Re-engagement</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ai-target-audience">Target Audience</label>
+              <select id="ai-target-audience" class="form-control">
+                <option value="customer">Customer Email</option>
+                <option value="trainer" selected>Trainer Email</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- INTEGRATED OPTIONAL IMAGE UPLOAD BOX -->
+          <div class="ai-image-section" style="margin-top: 6px;">
+            <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Attach Images for this Email (Optional)</label>
+            <div id="img-dropzone" class="dropzone compact-dropzone" style="margin-top: 6px; padding: 16px 12px;">
+              <div class="dropzone-icon" style="font-size: 1.5rem; margin-bottom: 4px;">🖼️</div>
+              <div class="dropzone-text" style="font-size: 0.8rem;">
+                <strong>Click to attach images</strong> or drag & drop here<br />
+                <small style="color: var(--text-muted); font-size: 0.72rem;">(Staged locally for preview until you press Publish)</small>
+              </div>
+              <input type="file" id="img-file-input" accept="image/*" multiple style="display: none;" />
+            </div>
+
+            <!-- STAGED IMAGES PREVIEW THUMBNAILS GRID -->
+            <div id="ai-staged-images-preview" class="ai-staged-images-preview" style="display: none; margin-top: 10px;">
+              <span class="preview-title" style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Attached Draft Images (<span id="img-count">0</span>):</span>
+              <div id="image-gallery-grid" class="image-gallery-grid compact-grid" style="margin-top: 6px;"></div>
+            </div>
+          </div>
+
+          <button id="btn-generate-ai" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 14px;">
+            <span>✨ Generate Gemini AI Drafts</span>
+          </button>
+
+          <!-- AI DRAFTS CONTAINER -->
+          <div id="ai-results-container" class="ai-results-container" style="display: none; margin-top: 24px;">
+            <h4 class="results-title">Generated Options (Select & Approve one):</h4>
+            <div id="ai-cards-list" class="ai-cards-list"></div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Eyebrow Badge</label>
-          <input type="text" id="eyebrow" class="form-control" />
-        </div>
-
-        <div class="form-group">
-          <label>Main Heading (H1)</label>
-          <input type="text" id="heading" class="form-control" />
-        </div>
-
-        <div class="form-group">
-          <label>Lede Subtitle</label>
-          <textarea id="lede" class="form-control"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Body Content</label>
-          <textarea id="bodyBlocks" class="form-control" rows="4"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Gate Box / Highlight Banner</label>
-          <textarea id="gateBox" class="form-control"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Checklist Items (Title|Desc lines)</label>
-          <textarea id="checklist" class="form-control" rows="5"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>CTA Button Text</label>
-          <input type="text" id="ctaText" class="form-control" />
-        </div>
-
-        <div class="form-group">
-          <label>CTA Button Link</label>
-          <input type="text" id="ctaUrl" class="form-control" />
-        </div>
-
-        <div class="form-group">
-          <label>Callout Box Title</label>
-          <input type="text" id="calloutTitle" class="form-control" />
-        </div>
-
-        <div class="form-group">
-          <label>Callout Box Description</label>
-          <textarea id="calloutDesc" class="form-control"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Custom Signature / Signoff</label>
-          <textarea id="signoffHtml" class="form-control" placeholder="Leave empty for audience default"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Show App Download Badges</label>
-          <select id="showAppBadges" class="form-control">
-            <option value="auto">Auto (Show for Customers)</option>
-            <option value="true">Force Show</option>
-            <option value="false">Hide</option>
-          </select>
-        </div>
-
-        <div class="form-group" style="margin-top: 10px;">
-          <label>Paste Raw Text / Text File Importer</label>
-          <textarea id="rawTextInput" class="form-control" rows="4" placeholder="Paste raw email text file content here to auto-fill fields..."></textarea>
-          <button id="btn-import-raw" class="btn btn-secondary" style="margin-top: 6px; width: 100%; justify-content: center;">Import Raw Text into Generator</button>
-        </div>
       </section>
 
+      <!-- RIGHT PREVIEW PANEL -->
       <section class="preview-panel">
         <div class="preview-toolbar">
           <div class="view-modes">
-            <button class="view-btn active" id="mode-desktop">Desktop Preview</button>
-            <button class="view-btn" id="mode-mobile">Mobile Preview</button>
+            <button class="view-btn active" id="mode-desktop">
+              💻 Desktop
+            </button>
+            <button class="view-btn" id="mode-mobile">
+              📱 Mobile
+            </button>
           </div>
-          <span style="color: var(--text-muted); font-size: 0.85rem;">Live SendMails Rendering</span>
+          <div class="preview-info">
+            <span id="current-audience-tag" class="audience-tag customer">Customer View</span>
+            <span class="live-indicator">● Live SendMails Render</span>
+          </div>
         </div>
         <div class="preview-frame-wrap">
-          <iframe id="preview-frame" title="Email Preview"></iframe>
+          <iframe id="preview-frame" title="SendMails Email Live Preview"></iframe>
         </div>
       </section>
+
     </main>
 
+    <!-- CODE MODAL -->
     <div id="modal-code" class="code-modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -151,6 +298,9 @@
         </div>
       </div>
     </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
   </div>
 
   <script type="module" src="/src/main.js"></script>
