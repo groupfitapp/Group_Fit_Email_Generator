@@ -217,7 +217,7 @@ ${appBadgesHtml}
 
 <!-- SOCIAL LINKS -->
 <div class="social">
-  <a href="https://facebook.com/groupfit.fb" target="_blank"><img src="https://groupfitapp.com/email-assets/facebook.png" alt="Facebook" height="22" width="22" /></a>
+  <a href="https://www.facebook.com/groupfitapp" target="_blank"><img src="https://groupfitapp.com/email-assets/facebook.png" alt="Facebook" height="22" width="22" /></a>
   <a href="https://www.instagram.com/groupfit_app" target="_blank"><img src="https://groupfitapp.com/email-assets/instagram.png" alt="Instagram" height="22" width="22" /></a>
   <a href="https://www.youtube.com/@GroupFitApp" target="_blank"><img src="https://groupfitapp.com/email-assets/youtube.png" alt="YouTube" height="22" width="22" /></a>
   <a href="https://www.tiktok.com/@groupfit.app" target="_blank"><img src="https://groupfitapp.com/email-assets/tiktok.png" alt="TikTok" height="22" width="22" /></a>
@@ -250,5 +250,5 @@ function escapeHtml(str) {
 
 function formatText(str) {
   if (!str) return '';
-  return str;
+  return str.replace(/\r\n/g, '\n').replace(/\n/g, '<br />');
 }

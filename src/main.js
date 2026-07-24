@@ -55,7 +55,7 @@ function getFormData() {
   let showAppBadges = true;
   if (appBadgesVal === 'true') showAppBadges = true;
   if (appBadgesVal === 'false') showAppBadges = false;
-  if (appBadgesVal === 'auto') showAppBadges = currentAudience === 'customer';
+  if (appBadgesVal === 'auto') showAppBadges = true;
 
   return {
     audience: currentAudience,
