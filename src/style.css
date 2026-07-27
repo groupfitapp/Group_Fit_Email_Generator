@@ -4,12 +4,12 @@
   --bg-card: #17172a;
   --bg-hover: #1e1e36;
   --border-color: #272744;
-  --border-focus: #dc2c36;
+  --border-focus: #333399;
   --text-main: #f3f3fb;
   --text-muted: #9595b2;
-  --accent-red: #dc2c36;
-  --accent-red-hover: #f03a45;
-  --accent-glow: rgba(220, 44, 54, 0.25);
+  --accent-red: #333399;
+  --accent-red-hover: #4d4db8;
+  --accent-glow: rgba(51, 51, 153, 0.25);
   --accent-blue: #3b82f6;
   --accent-green: #10b981;
   --accent-amber: #f59e0b;

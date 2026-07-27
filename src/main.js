@@ -57,7 +57,11 @@ function getFormData() {
   if (appBadgesVal === 'false') showAppBadges = false;
   if (appBadgesVal === 'auto') showAppBadges = true;
 
+  const templateTypeSelect = document.getElementById('templateType');
+  const templateType = templateTypeSelect ? templateTypeSelect.value : 'transactional';
+
   return {
+    templateType,
     audience: currentAudience,
     subject: document.getElementById('subject').value,
     previewText: document.getElementById('previewText').value,
@@ -602,6 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputs = document.querySelectorAll('.editor-panel .form-control');
   inputs.forEach(input => {
     input.addEventListener('input', updatePreview);
+    input.addEventListener('change', updatePreview);
   });
 
   const btnCopy = document.getElementById('btn-copy-html');
