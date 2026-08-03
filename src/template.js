@@ -247,8 +247,8 @@ export function generateEmailHtml(data = {}) {
     googleUrl = data.googleUrl || defaults.googleUrl
   } = data;
 
-  // Show App Badges by default for both Customer (Customer App) and Trainer (Trainer App)
-  const showAppBadges = data.showAppBadges !== false;
+  // Show App Badges — handle both boolean false and string 'false' from form select
+  const showAppBadges = data.showAppBadges !== false && data.showAppBadges !== 'false';
 
   const eyebrowHtml = eyebrow
     ? `<span class="eyebrow">${escapeHtml(eyebrow)}</span>`
@@ -282,19 +282,32 @@ ${checklist.map((item, idx) => `<tr>
 </table>`
     : '';
 
+  const brandColor = audience === 'trainer' ? '#dc2c36' : '#4f46e5';
+  const brandColorHexClean = audience === 'trainer' ? 'dc2c36' : '4f46e5';
+
+  const logoImageHtml = `<a href="${escapeHtml(logoUrl)}" target="_blank" rel="noopener"><img src="https://groupfitapp.com/email-assets/logo-square.png?v=2" alt="Group Fit" style="height:48px;width:auto;display:block;border:0;" /></a>`;
+
   const ctaBtnHtml = ctaText && ctaUrl
     ? `\n<!-- CTA BUTTON -->\n<div class="btn-wrap">
 <!--[if mso]>
-<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${escapeHtml(ctaUrl)}" style="height:48px;v-text-anchor:middle;width:240px;" arcsize="20%" stroke="f" fillcolor="#4f46e5">
+<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${escapeHtml(ctaUrl)}" style="height:48px;v-text-anchor:middle;width:240px;" arcsize="20%" stroke="f" fillcolor="${brandColor}">
   <w:anchorlock/>
   <center style="color:#ffffff;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;">${escapeHtml(ctaText)}</center>
 </v:roundrect>
 <![endif]-->
 <!--[if !mso]><!-- -->
-<a href="${escapeHtml(ctaUrl)}" class="btn gf-cta" target="_blank">${escapeHtml(ctaText)}</a>
+<a href="${escapeHtml(ctaUrl)}" class="btn gf-cta" target="_blank" rel="noopener">${escapeHtml(ctaText)}</a>
 <!--<![endif]-->
 </div>`
     : '';
+
+  const socialLinksHtml = `<div class="social">
+  <a href="https://www.facebook.com/groupfitapp" target="_blank" rel="noopener"><img src="https://groupfitapp.com/email-assets/facebook.png" alt="Facebook" height="22" width="22" style="display:inline-block;vertical-align:middle;margin:0 6px;" /></a>
+  <a href="https://www.instagram.com/groupfit_app" target="_blank" rel="noopener"><img src="https://groupfitapp.com/email-assets/instagram.png" alt="Instagram" height="22" width="22" style="display:inline-block;vertical-align:middle;margin:0 6px;" /></a>
+  <a href="https://www.linkedin.com/company/groupfitapp" target="_blank" rel="noopener"><img src="https://groupfitapp.com/email-assets/linkedin.png" alt="LinkedIn" height="22" width="22" style="display:inline-block;vertical-align:middle;margin:0 6px;" /></a>
+  <a href="https://www.tiktok.com/@groupfit.app" target="_blank" rel="noopener"><img src="https://groupfitapp.com/email-assets/tiktok.png" alt="TikTok" height="22" width="22" style="display:inline-block;vertical-align:middle;margin:0 6px;" /></a>
+  <a href="https://www.youtube.com/@GroupFitApp" target="_blank" rel="noopener"><img src="https://groupfitapp.com/email-assets/youtube.png" alt="YouTube" height="22" width="22" style="display:inline-block;vertical-align:middle;margin:0 6px;" /></a>
+</div>`;
 
   const calloutHtml = calloutBox && (calloutBox.title || calloutBox.desc)
     ? `\n<!-- CALLOUT BOX -->\n<div class="callout-box">${calloutBox.title ? `<strong>${escapeHtml(calloutBox.title)}</strong><br />` : ''}<span class="callout-desc">${formatText(calloutBox.desc)}</span></div>`
@@ -322,128 +335,77 @@ ${checklist.map((item, idx) => `<tr>
   Preview: ${previewText}
 -->
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="color-scheme" content="light dark">
 <meta name="supported-color-schemes" content="light dark">
 <title>${escapeHtml(subject)}</title>
-<!--[if mso]>
-<xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml>
-<![endif]-->
+<!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
 <style>
-:root { color-scheme: light dark; supported-color-schemes: light dark; }
-body { margin:0; padding:0; background-color:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#0f172a; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+body { margin:0; padding:0; background-color:#fafafa; font-family:'Inter',Helvetica,Arial,sans-serif; color:#1a1a2e; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
 table { border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; }
 img { border:0; height:auto; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
-a { color:#4f46e5; text-decoration:none; }
-
-.wrap { width:100%; background-color:#f8fafc; padding:40px 16px; box-sizing:border-box; }
-.container { max-width:600px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(15,23,42,0.06); border:1px solid #e2e8f0; }
-
-.logo-block { padding:32px 40px 12px; border-bottom:1px solid #f1f5f9; background:transparent; text-align:left; }
-.brand-mark { display:inline-flex; align-items:center; gap:10px; text-decoration:none; }
-.logo-icon-svg { width:32px; height:32px; vertical-align:middle; }
-.brand-title { font-size:22px; font-weight:800; letter-spacing:-0.03em; color:#0f172a; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; vertical-align:middle; display:inline-block; }
-.brand-accent { color:#4f46e5; }
-
-.hero { padding:28px 40px 16px; }
-.eyebrow { display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; color:#4f46e5; background:#eef2ff; padding:6px 12px; border-radius:999px; margin:0 0 16px; }
-.h1 { font-size:28px; font-weight:800; color:#0f172a; line-height:1.2; letter-spacing:-0.03em; margin:0 0 12px; }
-.lede { font-size:16px; color:#475569; line-height:1.6; margin:0; }
-
-.body { padding:0 40px 8px; }
-.text-block { font-size:15px; line-height:1.65; color:#334155; margin:0 0 20px; }
-.gate-box { background:#f8fafc; border-left:4px solid #4f46e5; padding:16px 20px; margin:0 0 24px; font-size:14.5px; line-height:1.6; color:#334155; border-radius:0 10px 10px 0; border-top:1px solid #e2e8f0; border-right:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0; }
-.gate-box strong { color:#0f172a; }
-
-.btn-wrap { text-align:left; margin:12px 0 28px; }
-.btn { display:inline-block; background:#4f46e5; color:#ffffff !important; text-decoration:none; font-size:15px; font-weight:600; padding:14px 28px; border-radius:10px; text-align:center; box-shadow:0 4px 12px rgba(79,70,229,0.25); }
-
-.section-label { font-size:13px; font-weight:700; color:#0f172a; text-transform:uppercase; letter-spacing:0.8px; margin:0 0 12px; }
+a { color:${brandColor}; }
+.wrap { width:100%; background-color:#fafafa; padding:48px 16px; box-sizing:border-box; }
+.container { max-width:600px; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(20,20,40,0.06); border:1px solid #f2f2f5; }
+.logo-block { padding:36px 44px 8px; }
+.logo-block img { height:48px; width:auto; display:block; border:0; }
+.hero { padding:24px 44px 24px; }
+.eyebrow { display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:${brandColor}; background:${brandColor}14; padding:6px 12px; border-radius:999px; margin:0 0 18px; font-family:'Inter',Helvetica,Arial,sans-serif; }
+.h1 { font-family:'Space Grotesk',Helvetica,Arial,sans-serif; font-size:32px; font-weight:700; color:#0a0a1f; line-height:1.15; letter-spacing:-0.5px; margin:0 0 12px; }
+.lede { font-size:16px; color:#5a5a72; line-height:1.6; margin:0; }
+.body { padding:0 44px 8px; }
+.text-block { font-size:15px; line-height:1.7; color:#3a3a4f; margin:0 0 24px; }
+.gate-box { background:${brandColor}0f; border-left:3px solid ${brandColor}; padding:16px 20px; margin:0 0 28px; font-size:14.5px; line-height:1.65; color:#3a3a4f; border-radius:0 8px 8px 0; }
+.gate-box strong { color:#0a0a1f; }
+.btn-wrap { text-align:left; margin:8px 0 28px; }
+.btn { display:inline-block; background:${brandColor}; color:#ffffff !important; text-decoration:none; font-size:15px; font-weight:600; padding:14px 28px; border-radius:10px; letter-spacing:0.2px; text-align:center; }
+.section-label { font-family:'Space Grotesk',Helvetica,Arial,sans-serif; font-size:13px; font-weight:600; color:#0a0a1f; margin:0 0 12px; letter-spacing:-0.2px; }
 .checklist { width:100%; border-collapse:collapse; margin:0 0 24px; }
-.checklist td { padding:14px 0; border-bottom:1px solid #f1f5f9; vertical-align:top; }
+.checklist td { padding:14px 0; border-bottom:1px solid #f2f2f5; vertical-align:top; }
 .checklist tr:last-child td { border-bottom:none; }
 .num-cell { width:34px; min-width:34px; }
-.num { display:inline-block; width:26px; height:26px; line-height:26px; background:#4f46e5; color:#ffffff; font-size:12px; font-weight:700; text-align:center; border-radius:50%; }
-.item-title { font-size:15px; font-weight:600; color:#0f172a; display:block; margin-bottom:3px; }
-.item-desc { font-size:14px; color:#64748b; line-height:1.55; }
-
-.callout-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px 20px; margin:0 0 24px; }
-.callout-desc { font-size:14px; color:#475569; line-height:1.6; }
-.signoff { font-size:15px; line-height:1.65; color:#334155; margin:24px 0 8px; }
-.signoff strong { color:#0f172a; }
-
-.social { text-align:center; padding:24px 40px 12px; border-top:1px solid #f1f5f9; }
-.social a { display:inline-block; margin:0 8px; text-decoration:none; }
-.footer { text-align:center; font-size:12px; color:#94a3b8; padding:8px 40px 32px; line-height:1.6; }
-.footer a { color:#4f46e5; text-decoration:underline; }
-
-@media (prefers-color-scheme: dark) {
-  body, .wrap { background-color:#0b0f19 !important; }
-  .container { background-color:#161e2e !important; border-color:#273549 !important; box-shadow:0 10px 30px rgba(0,0,0,0.5) !important; }
-  .logo-block { border-bottom-color:#273549 !important; }
-  .brand-title { color:#ffffff !important; }
-  .h1 { color:#f8fafc !important; }
-  .lede, .text-block, .signoff { color:#cbd5e1 !important; }
-  .signoff strong, .item-title, .section-label, .gate-box strong { color:#f8fafc !important; }
-  .eyebrow { background-color:rgba(99,102,241,0.15) !important; color:#818cf8 !important; }
-  .gate-box { background-color:#0f172a !important; border-color:#273549 !important; color:#cbd5e1 !important; }
-  .callout-box { background-color:#0f172a !important; border-color:#273549 !important; color:#cbd5e1 !important; }
-  .callout-desc, .item-desc { color:#94a3b8 !important; }
-  .checklist td { border-bottom-color:#273549 !important; }
-  .btn, a.gf-cta { background-color:#6366f1 !important; color:#ffffff !important; }
-  .social { border-top-color:#273549 !important; }
-  .footer { color:#64748b !important; }
-}
-
-[data-ogsc] body, [data-ogsc] .wrap { background-color:#0b0f19 !important; }
-[data-ogsc] .container { background-color:#161e2e !important; border-color:#273549 !important; }
-[data-ogsc] .brand-title, [data-ogsc] .h1 { color:#ffffff !important; }
-[data-ogsc] .lede, [data-ogsc] .text-block { color:#cbd5e1 !important; }
-[data-ogsc] .btn { background-color:#6366f1 !important; color:#ffffff !important; }
+.num { display:inline-block; width:26px; height:26px; line-height:26px; background:${brandColor}; color:#ffffff; font-size:12px; font-weight:700; text-align:center; border-radius:50%; font-family:'Inter',Helvetica,Arial,sans-serif; }
+.item-title { font-size:15px; font-weight:600; color:#0a0a1f; display:block; margin-bottom:3px; }
+.item-desc { font-size:14px; color:#5a5a72; line-height:1.55; }
+.callout-box { background:#fafafa; border:1px solid #f2f2f5; border-radius:10px; padding:14px 16px; margin:0 0 24px; }
+.callout-desc { font-size:14px; color:#5a5a72; line-height:1.6; }
+.signoff { font-size:15px; line-height:1.7; color:#3a3a4f; margin:24px 0 8px; }
+.signoff strong { color:#0a0a1f; }
+.social { text-align:center; padding:24px 44px 8px; border-top:1px solid #f2f2f5; }
+.social a { display:inline-block; margin:0 6px; opacity:0.85; text-decoration:none; }
+.footer { text-align:center; font-size:12px; color:#9a9aa8; padding:8px 44px 32px; line-height:1.6; }
+.footer a { color:${brandColor}; text-decoration:underline; }
 
 @media only screen and (max-width:620px) {
   .wrap { padding:0 !important; }
   .container { border-radius:0 !important; box-shadow:none !important; border:none !important; }
-  .logo-block { padding:24px 20px 12px !important; }
-  .hero { padding:20px 20px 16px !important; }
-  .h1 { font-size:24px !important; }
-  .body { padding:0 20px 8px !important; }
-  .btn { display:block !important; text-align:center !important; padding:15px 24px !important; }
-  .social { padding:20px 20px 8px !important; }
-  .footer { padding:8px 20px 28px !important; }
+  .logo-block { padding:28px 24px 4px !important; }
+  .hero { padding:20px 24px 20px !important; }
+  .h1 { font-size:26px !important; }
+  .body { padding:0 24px 4px !important; }
+  .btn { display:block !important; text-align:center !important; padding:16px 24px !important; }
+  .social { padding:20px 24px 8px !important; }
+  .footer { padding:8px 24px 28px !important; }
 }
 </style>
 </head>
 <body>
 <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">${escapeHtml(previewText)}</div>
-<!--[if mso]><center><table><tr><td width="600"><![endif]-->
-
+<!-- [if mso]><center><table><tr><td width="600"><![endif]-->
 <div class="wrap">
 <div class="container">
-
-<!-- LOGO HEADER (Transparent SVG / Brand Mark - Flawless on Dark & Light) -->
-<div class="logo-block">
-  <a href="${escapeHtml(logoUrl)}" target="_blank" class="brand-mark">
-    <!-- Clean transparent athletic vector logo mark -->
-    <svg class="logo-icon-svg" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="8" fill="#4F46E5"/>
-      <path d="M16 7L24 12V20L16 25L8 20V12L16 7Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
-      <circle cx="16" cy="16" r="3.5" fill="white"/>
-    </svg>
-    <span class="brand-title"><span class="brand-accent">Group</span> Fit</span>
-  </a>
-</div>
-
+<!-- LOGO -->
+<div class="logo-block">${logoImageHtml}</div>
 <!-- HERO -->
 <div class="hero">
   ${eyebrowHtml}
   <h1 class="h1">${escapeHtml(heading)}</h1>
   ${ledeHtml}
 </div>
-
 <!-- BODY -->
 <div class="body">
 ${bodyHtml}
@@ -454,26 +416,16 @@ ${calloutHtml}
 ${signoffHtml}
 ${appBadgesHtml}
 </div>
-
 <!-- SOCIAL LINKS -->
-<div class="social">
-  <a href="https://www.facebook.com/groupfitapp" target="_blank"><img src="https://cdn.simpleicons.org/facebook/6366f1" alt="Facebook" height="20" width="20" style="display:inline-block;vertical-align:middle;" /></a>
-  <a href="https://www.instagram.com/groupfit_app" target="_blank"><img src="https://cdn.simpleicons.org/instagram/6366f1" alt="Instagram" height="20" width="20" style="display:inline-block;vertical-align:middle;" /></a>
-  <a href="https://www.youtube.com/@GroupFitApp" target="_blank"><img src="https://cdn.simpleicons.org/youtube/6366f1" alt="YouTube" height="20" width="20" style="display:inline-block;vertical-align:middle;" /></a>
-  <a href="https://www.tiktok.com/@groupfit.app" target="_blank"><img src="https://cdn.simpleicons.org/tiktok/6366f1" alt="TikTok" height="20" width="20" style="display:inline-block;vertical-align:middle;" /></a>
-  <a href="https://www.linkedin.com/company/101067588" target="_blank"><img src="https://cdn.simpleicons.org/linkedin/6366f1" alt="LinkedIn" height="20" width="20" style="display:inline-block;vertical-align:middle;" /></a>
-</div>
-
+${socialLinksHtml}
 <!-- FOOTER -->
 <div class="footer">
   <div>&copy; 2026 GroupFit Technologies Inc. All rights reserved.</div>
   <div style="margin-top: 6px;"><a href="{UNSUBSCRIBE_URL}">Click here to unsubscribe</a></div>
 </div>
-
 </div>
 </div>
-
-<!--[if mso]></td></tr></table></center><![endif]-->
+<!-- [if mso]></td></tr></table></center><![endif]-->
 </body>
 </html>`;
 }

@@ -26,33 +26,41 @@ export async function generateAiEmailDrafts({ prompt, audience = 'customer', cat
 async function fetchGeminiLlmDrafts({ prompt, audience, category, apiKey }) {
   const isTrainer = audience === 'trainer';
 
-  const systemInstruction = `You are a world-class conversion email copywriter for Group Fit (an app connecting clients with certified fitness trainers).
-Your task is to generate 3 distinct, highly engaging, professional email options based on the user's prompt.
+  const systemInstruction = "You are an elite, world-class conversion copywriter for Group Fit, an on-demand fitness platform in Canada connecting clients with certified personal trainers.\n\n" +
+    "TASK: Write 3 distinct, highly persuasive, high-converting HTML-ready email template JSON drafts based on the user's instructions.\n\n" +
+    "CRITICAL COPYWRITING RULES:\n" +
+    "1. TONE & STYLE: Closely follow all tone, style, and urgency requests in the user prompt (e.g., 'extremely persuasive', 'urgent', 'friendly'). Use proven copywriting frameworks (PAS, AIDA) to maximize engagement and action.\n" +
+    "2. DO NOT ECHO: Do NOT copy the user prompt text verbatim into headers or subjects. Synthesize the core offer into compelling, polished marketing copy.\n" +
+    "3. RAW URL FOR CTA: The ctaUrl MUST be a plain URL string without markdown formatting or brackets. Output exactly \"https://groupfitapp.com\" or \"https://portal.groupfitapp.com/login\".\n\n" +
+    "Target Audience: " + (isTrainer ? 'Trainer (B2B Coach)' : 'Customer (B2C Client)') + "\n" +
+    "Category: " + category + "\n" +
+    "User Prompt / Goal: \"" + prompt + "\"\n\n" +
+    "Return ONLY a valid JSON array of 3 objects containing exact keys:\n" +
+    "[\n" +
+    "  {\n" +
+    "    \"title\": \"Short Strategy Title (e.g. High-Urgency Cash Incentive)\",\n" +
+    "    \"audience\": \"" + audience + "\",\n" +
+    "    \"subject\": \"Attention-Grabbing Subject Line\",\n" +
+    "    \"previewText\": \"Hooking Preview Text Snippet\",\n" +
+    "    \"eyebrow\": \"REFERRAL PROGRAM\",\n" +
+    "    \"heading\": \"Persuasive Headline with {SUBSCRIBER_FIRST_NAME}\",\n" +
+    "    \"lede\": \"Compelling sub-headline highlighting immediate benefit\",\n" +
+    "    \"bodyBlocks\": [\"Paragraph 1 driving desire & benefit.\", \"Paragraph 2 explaining the simple action step.\"],\n" +
+    "    \"gateBox\": \"Highlighted summary callout box\",\n" +
+    "    \"checklist\": [\n" +
+    "      { \"title\": \"Step 1 Title\", \"desc\": \"Step 1 description\" },\n" +
+    "      { \"title\": \"Step 2 Title\", \"desc\": \"Step 2 description\" }\n" +
+    "    ],\n" +
+    "    \"ctaText\": \"Action-Oriented CTA Button\",\n" +
+    "    \"ctaUrl\": \"" + (isTrainer ? 'https://portal.groupfitapp.com/login' : 'https://groupfitapp.com') + "\",\n" +
+    "    \"calloutBox\": { \"title\": \"Pro Tip / Urgency Note\", \"desc\": \"Helpful note or scarcity trigger\" },\n" +
+    "    \"showAppBadges\": true,\n" +
+    "    \"signoffHtml\": \"Train strong,<br /><strong>Group Fit Team</strong>\"\n" +
+    "  }\n" +
+    "]\n\n" +
+    "Output raw JSON ONLY. Do not wrap in markdown or code blocks.";
 
-Target Audience: ${isTrainer ? 'Trainer (B2B/Coach)' : 'Customer (B2C/Member)'}
-Email Strategy: ${category}
-User Prompt: ${prompt}
-
-Format your output MUST be a valid JSON array containing exactly 3 objects with these keys:
-- title: Short strategy title (string)
-- audience: "${audience}"
-- subject: Catchy subject line (string)
-- previewText: Compelling inbox preview text snippet (string)
-- eyebrow: Uppercase badge text e.g. "NEW FEATURE", "WELCOME" (string)
-- heading: Attention-grabbing main H1 title with placeholder {SUBSCRIBER_FIRST_NAME} (string)
-- lede: Subtitle paragraph line (string)
-- bodyBlocks: Array of 2 distinct paragraph strings (array of strings)
-- gateBox: Highlighted notice or callout box text (string)
-- checklist: Array of 3 items with { "title": "...", "desc": "..." }
-- ctaText: High-converting CTA button text (string)
-- ctaUrl: "${isTrainer ? 'https://portal.groupfitapp.com/login' : 'https://groupfitapp.com'}"
-- calloutBox: Object with { "title": "...", "desc": "..." }
-- showAppBadges: true
-- signoffHtml: "Train strong,<br /><strong>Group Fit Team</strong>"
-
-Output JSON array ONLY without markdown formatting or code blocks.`;
-
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -63,18 +71,24 @@ Output JSON array ONLY without markdown formatting or code blocks.`;
   });
 
   if (!response.ok) {
-    throw new Error(`Gemini API returned status ${response.status}`);
+    throw new Error("Gemini API error: " + response.status);
   }
 
   const data = await response.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) return null;
+  const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!rawText) return null;
 
-  const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-  const parsed = JSON.parse(cleanJson);
+  const jsonString = rawText
+    .replace(/^```json\s*/i, '')
+    .replace(/^```\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
+
+  const parsed = JSON.parse(jsonString);
   if (Array.isArray(parsed) && parsed.length > 0) {
     return parsed.map(item => ({
       ...item,
+      ctaUrl: cleanUrl(item.ctaUrl) || (isTrainer ? '[https://portal.groupfitapp.com/login](https://portal.groupfitapp.com/login)' : '[https://groupfitapp.com](https://groupfitapp.com)'),
       showAppBadges: true,
       signoffHtml: "Train strong,<br /><strong>Group Fit Team</strong>"
     }));
@@ -83,204 +97,206 @@ Output JSON array ONLY without markdown formatting or code blocks.`;
 }
 
 function generateFallbackDrafts(cleanPrompt, isTrainer, category) {
-  let topic = cleanPrompt.length > 3 ? cleanPrompt : 'Group Fit Feature Update';
-  const option1 = generateOptionByGoal(topic, isTrainer, category, 'primary');
-  const option2 = generateOptionByGoal(topic, isTrainer, category, 'secondary');
-  const option3 = generateOptionByGoal(topic, isTrainer, category, 'tertiary');
-
-  return [option1, option2, option3];
-}
-
-function generateOptionByGoal(topic, isTrainer, category, variant) {
-  const capTopic = capitalize(topic);
+  const topic = extractCleanTopic(cleanPrompt);
   const defaultSignoff = "Train strong,<br /><strong>Group Fit Team</strong>";
+  const defaultCtaUrl = isTrainer ? "[https://portal.groupfitapp.com/login](https://portal.groupfitapp.com/login)" : "[https://groupfitapp.com](https://groupfitapp.com)";
 
-  if (category === 'announcement') {
-    if (isTrainer) {
-      if (variant === 'primary') {
-        return {
-          title: "Official Feature Announcement",
-          audience: "trainer",
-          subject: `New Feature Announcement: ${capTopic} is Live! 🚀`,
-          previewText: "Log in to your portal to try out our newest trainer tools today.",
-          eyebrow: "New Feature Announcement",
-          heading: `Upgrade Your Business with ${capTopic}, {SUBSCRIBER_FIRST_NAME}!`,
-          lede: "We're excited to roll out new updates designed to help certified Group Fit trainers connect with more local clients faster.",
-          bodyBlocks: [
-            `We've added powerful new tools to your Group Fit Trainer Portal to streamline your client outreach and manage your bookings effortlessly.`,
-            "Take advantage of these new capabilities today to keep your weekly schedule full and boost your overall earnings."
-          ],
-          gateBox: "<strong>Where to find it:</strong> Log into your Group Fit Trainer Dashboard and check out the new feature tab.",
-          checklist: [
-            { title: "Explore New Dashboard Tools", desc: "Test the updated controls tailored for certified coaches." },
-            { title: "Update Your Availability", desc: "Make sure open time slots reflect your current weekly schedule." },
-            { title: "Respond to Client Inquiries", desc: "Connect with new prospective clients looking for your training format." }
-          ],
-          ctaText: "Explore New Feature",
-          ctaUrl: "https://portal.groupfitapp.com/login",
-          calloutBox: { title: "Pro Tip", desc: "Trainers who complete setup within 48 hours see highest client conversion!" },
-          showAppBadges: true,
-          signoffHtml: defaultSignoff
-        };
-      } else {
-        return {
-          title: "Concise Feature Digest",
-          audience: "trainer",
-          subject: `Trainer Feature Update: ${capTopic}`,
-          previewText: "See how this update makes finding and managing clients easier.",
-          eyebrow: "Product Update",
-          heading: `New Capabilities for Group Fit Trainers, {SUBSCRIBER_FIRST_NAME}.`,
-          lede: "Here is a quick overview of what's new in your trainer portal this week.",
-          bodyBlocks: [
-            "Our latest release focuses on helping you present your certified skills effectively and connect directly with local fitness clients."
-          ],
-          gateBox: "<strong>Quick Action:</strong> Check your portal settings to ensure your specializations are up to date.",
-          checklist: [
-            { title: "Verify Your Travel Radius", desc: "Confirm the ZIP codes where you offer in-person coaching." },
-            { title: "Review Specializations", desc: "Select all activities you coach to maximize your search matches." }
-          ],
-          ctaText: "Open Trainer Portal",
-          ctaUrl: "https://portal.groupfitapp.com/login",
-          calloutBox: { title: "Questions?", desc: "Reply directly to this email to reach our trainer support team." },
-          showAppBadges: true,
-          signoffHtml: defaultSignoff
-        };
+  // Dynamic seed so clicking the button multiple times generates new variations
+  const seed = Math.floor(Math.random() * 3);
+
+  if (cleanPrompt.toLowerCase().includes('referral') || category === 'promotion') {
+    const subjectsP1 = [
+      "Give $0, Get $50: Earn Cash Every Time Friends Train! 🏋️",
+      "Claim $50 Cash For Every Friend You Invite to Group Fit 💸",
+      "Your Friends Workout Free & You Get $50 — Here's How"
+    ];
+
+    const headingsP1 = [
+      "Earn Unlimited $50 Cash Rewards, {SUBSCRIBER_FIRST_NAME}!",
+      "Turn Your Workout Network into $50 Rewards, {SUBSCRIBER_FIRST_NAME}",
+      "Pass Along Free Sessions & Claim $50, {SUBSCRIBER_FIRST_NAME}!"
+    ];
+
+    return [
+      {
+        title: "Persuasive Cash Incentive Strategy",
+        audience: isTrainer ? "trainer" : "customer",
+        subject: subjectsP1[seed % 3],
+        previewText: "Your friends get unlimited free try-out sessions, and you collect $50 the moment they complete their first paid workout.",
+        eyebrow: "EXCLUSIVE REFERRAL OFFER",
+        heading: headingsP1[seed % 3],
+        lede: "Fitness is better together — and much more rewarding. Now you can give your friends free access to top certified trainers while earning $50 for every referral.",
+        bodyBlocks: [
+          "Finding the right personal trainer shouldn't be a gamble. With the Group Fit Referral Program, your friends can book FREE try-out sessions with as many local trainers as they want until they find the coach that matches their exact goals and energy.",
+          "The moment your referred friend completes their first paid 60-minute session, we automatically deposit a $50 cash credit into your account. There are zero caps or limits on how much you can earn!"
+        ],
+        gateBox: "<strong>How it works:</strong> Share code → Friend books FREE sessions with any trainer → You get $50 cash credit after their first paid session.",
+        checklist: [
+          { title: "Share Your Link", desc: "Send your invite link or referral code to friends, family, and coworkers." },
+          { title: "Friend Trains for Free", desc: "They try top local coaches at zero cost using your referral code." },
+          { title: "Collect $50 Cash", desc: "Get $50 credited directly to your account after their first paid booking." }
+        ],
+        ctaText: "Get My Referral Link & Code",
+        ctaUrl: defaultCtaUrl,
+        calloutBox: { title: "Unlimited Cash Earnings", desc: "Refer 5 friends and earn $250. There is no cap on your referral earnings!" },
+        showAppBadges: true,
+        signoffHtml: defaultSignoff
+      },
+      {
+        title: "Community Growth Focus",
+        audience: isTrainer ? "trainer" : "customer",
+        subject: "Help Friends Find Their Ideal Coach (And Collect $50)",
+        previewText: "Give your friends free try-outs with certified coaches and earn $50 per paid client.",
+        eyebrow: "COMMUNITY REWARDS",
+        heading: "Give Free Workouts, Get $50 Cash, {SUBSCRIBER_FIRST_NAME}",
+        lede: "Introduce your friends to verified personal trainers, studio coaches, and fitness specialists in your area.",
+        bodyBlocks: [
+          "Finding a coach you click with makes all the difference. That's why we allow your referred friends to try out different trainers with free session credits until they find the coach that fits.",
+          "As a thank you for growing the Group Fit community, you'll earn $50 for every friend who signs up and completes a paid booking."
+        ],
+        gateBox: "<strong>Exclusive Bonus:</strong> $50 per successful referral credited directly to your account.",
+        checklist: [
+          { title: "Copy Your Invite Code", desc: "Find your code inside your Group Fit app profile." },
+          { title: "Invite Workout Partners", desc: "Send it via text, social media, or email." }
+        ],
+        ctaText: "Start Referring Friends Now",
+        ctaUrl: defaultCtaUrl,
+        calloutBox: { title: "100% Risk-Free", desc: "Your friends pay nothing for their initial try-out sessions." },
+        showAppBadges: true,
+        signoffHtml: defaultSignoff
+      },
+      {
+        title: "Direct Benefit Summary",
+        audience: isTrainer ? "trainer" : "customer",
+        subject: "Did you know you can earn $50 on Group Fit?",
+        previewText: "Pass along free try-out sessions to anyone looking for certified trainers.",
+        eyebrow: "GROUP FIT REWARDS",
+        heading: "Claim Your $50 Referral Credit, {SUBSCRIBER_FIRST_NAME}",
+        lede: "Help your network achieve their fitness goals while earning extra cash.",
+        bodyBlocks: [
+          "Share Group Fit with anyone interested in in-person or virtual coaching. They get free initial workouts to test out coaches, and you earn $50 after their first paid booking."
+        ],
+        gateBox: "<strong>Quick Link:</strong> Open your account dashboard to view and share your unique referral link.",
+        checklist: [
+          { title: "Open Account Dashboard", desc: "Access your referral card inside your account." },
+          { title: "Track Pending Payouts", desc: "Monitor earnings as friends complete workouts." }
+        ],
+        ctaText: "Claim My Referral Code",
+        ctaUrl: defaultCtaUrl,
+        calloutBox: { title: "No Limits", desc: "Refer as many friends as you like!" },
+        showAppBadges: true,
+        signoffHtml: defaultSignoff
       }
-    } else {
-      return {
-        title: "Customer Feature Spotlight",
-        audience: "customer",
-        subject: `Introducing ${capTopic} — Built for Your Fitness Goals! ✨`,
-        previewText: "Check out the newest feature designed to make finding top trainers effortless.",
-        eyebrow: "New Feature Alert",
-        heading: `Discover ${capTopic}, {SUBSCRIBER_FIRST_NAME}!`,
-        lede: "Finding and booking the right certified fitness trainer just got whole lot easier.",
-        bodyBlocks: [
-          "We've launched new features inside Group Fit so you can connect with verified personal trainers, studio coaches, and fitness specialists on your terms.",
-          "Set your workout goals, choose your preferred format (In-Person, Virtual, or Studio), and let top local coaches bring custom options to you."
-        ],
-        gateBox: "<strong>Try it now:</strong> Open the Group Fit app to set your preferences and explore newly matched trainers.",
-        checklist: [
-          { title: "Set Your Preferences", desc: "Choose your favorite activities and workout formats." },
-          { title: "Compare Verified Coaches", desc: "Explore ratings, certifications, and specialties." },
-          { title: "Book Flexible Sessions", desc: "Schedule workouts that fit seamlessly into your week." }
-        ],
-        ctaText: "Explore New Feature",
-        ctaUrl: "https://groupfitapp.com",
-        calloutBox: { title: "Always in Control", desc: "You can update your preferences or pause trainer matching anytime." },
-        showAppBadges: true,
-        signoffHtml: defaultSignoff
-      };
-    }
+    ];
   }
 
-  if (category === 'onboarding') {
-    if (isTrainer) {
-      return {
-        title: "Trainer Setup & Verification Guide",
-        audience: "trainer",
-        subject: `Action Required: Complete Your Trainer Profile, {SUBSCRIBER_FIRST_NAME}`,
-        previewText: "Customers can only book you after your profile is complete and approved.",
-        eyebrow: "Profile Onboarding",
-        heading: `Finish Your Profile First, {SUBSCRIBER_FIRST_NAME}.`,
-        lede: "Your trainer profile is your digital storefront. Completing these required steps allows clients to book you through Group Fit.",
-        bodyBlocks: [
-          "Customers can only book you after your profile is complete and verified. The faster you finish the basics, the faster you can start accepting client bookings.",
-          "Make sure your profile picture, service locations, and pricing reflect your exact coaching offerings."
-        ],
-        gateBox: "<strong>Do this first:</strong> Add a clear profile photo, complete your bio, set your travel radius, and add your specializations.",
-        checklist: [
-          { title: "Upload Profile Picture", desc: "Use a clear individual face shot with good lighting." },
-          { title: "Set Service Locations", desc: "Define your travel radius or studio location." },
-          { title: "Add Availability & Pricing", desc: "Set the days, time slots, and rates clients can book." }
-        ],
-        ctaText: "Complete My Profile",
-        ctaUrl: "https://portal.groupfitapp.com/login",
-        calloutBox: { title: "Need Assistance?", desc: "If you don't see your specific certification listed, reply to us and we will add it for you." },
-        showAppBadges: true,
-        signoffHtml: defaultSignoff
-      };
-    } else {
-      return {
-        title: "Customer Welcome & Getting Started",
-        audience: "customer",
-        subject: `Welcome to Group Fit, {SUBSCRIBER_FIRST_NAME}! Let's Get Started 🏋️`,
-        previewText: "Here is your quick 3-step guide to finding and booking top local trainers.",
-        eyebrow: "Welcome to Group Fit",
-        heading: `Welcome Aboard, {SUBSCRIBER_FIRST_NAME}!`,
-        lede: "We're thrilled to help you reach your fitness goals with certified personal trainers and specialized coaches.",
-        bodyBlocks: [
-          "Whether you train at home, in a studio, or virtually, Group Fit connects you with verified fitness professionals tailored to your needs.",
-          "Here are the quick steps to finding your ideal trainer and scheduling your first workout."
-        ],
-        gateBox: "<strong>Quick Start:</strong> Download the Group Fit mobile app or log into your web dashboard to start browsing coaches near you.",
-        checklist: [
-          { title: "Download the App", desc: "Get Group Fit on iOS or Android for easy booking on the go." },
-          { title: "Set Your Goals", desc: "Select from boxing, running, strength, yoga, and swimming." },
-          { title: "Book Your First Session", desc: "Schedule directly with certified coaches in your area." }
-        ],
-        ctaText: "Find My Trainer",
-        ctaUrl: "https://groupfitapp.com",
-        calloutBox: { title: "100% Flexible", desc: "Cancel or reschedule sessions with full peace of mind." },
-        showAppBadges: true,
-        signoffHtml: defaultSignoff
-      };
-    }
-  }
-
-  if (category === 'promotion') {
-    return {
-      title: "High-Urgency Promo Campaign",
+  return [
+    {
+      title: "Primary Update Announcement",
       audience: isTrainer ? "trainer" : "customer",
-      subject: isTrainer ? `Limited Time Promo: ${capTopic} for Trainers!` : `Special Offer: ${capTopic} — Limited Time! 🎉`,
-      previewText: "Don't miss out on this exclusive offer designed for Group Fit members.",
-      eyebrow: "Limited Time Offer",
-      heading: isTrainer ? `Boost Your Earnings Today, {SUBSCRIBER_FIRST_NAME}!` : `Exclusive Savings Inside, {SUBSCRIBER_FIRST_NAME}!`,
-      lede: isTrainer
-        ? "Take advantage of our special promotional boost to get featured at the top of local client search results."
-        : "For a limited time, enjoy special promotional offers when booking certified trainers through Group Fit.",
+      subject: topic + ": Important Update for {SUBSCRIBER_FIRST_NAME}",
+      previewText: "Latest details and action items regarding " + topic + ".",
+      eyebrow: "GROUP FIT ANNOUNCEMENT",
+      heading: "Important Update Regarding " + topic + ", {SUBSCRIBER_FIRST_NAME}",
+      lede: "We are sharing an update regarding " + topic + " to keep our community informed.",
       bodyBlocks: [
-        isTrainer
-          ? "We are running a special promotion to connect top active trainers with high-intent client inquiries across all major workout formats."
-          : "Whether you're starting a new workout routine or pushing for new personal records, now is the perfect time to book a certified coach."
+        "We have updated our platform features and guidelines surrounding " + topic + ". These changes are designed to improve your overall experience on Group Fit.",
+        "Please log into your account to review any relevant details or update your preferences."
       ],
-      gateBox: "<strong>Promo Details:</strong> This limited-time promotion expires soon. Claim your offer today before open slots fill up!",
+      gateBox: "Summary: Review the latest details on " + topic + " inside your Group Fit account.",
       checklist: [
-        { title: "Claim Offer", desc: "Apply promo details directly in your account." },
-        { title: "Select Workout Slots", desc: "Lock in your preferred training times." }
+        { title: "Review Details", desc: "Check full announcement details inside your dashboard." },
+        { title: "Update Settings", desc: "Ensure your profile preferences are current." }
       ],
-      ctaText: isTrainer ? "Claim Trainer Offer" : "Claim Offer Now",
-      ctaUrl: isTrainer ? "https://portal.groupfitapp.com/login" : "https://groupfitapp.com",
-      calloutBox: { title: "Offer Conditions", desc: "Terms and conditions apply. Offer valid for active Group Fit accounts." },
+      ctaText: "Open Dashboard",
+      ctaUrl: defaultCtaUrl,
+      calloutBox: { title: "Need Help?", desc: "Contact support@groupfitapp.com for assistance." },
       showAppBadges: true,
       signoffHtml: defaultSignoff
-    };
+    },
+    {
+      title: "Quick Digest Update",
+      audience: isTrainer ? "trainer" : "customer",
+      subject: "Quick Notice: " + topic,
+      previewText: "A fast summary of changes regarding " + topic + ".",
+      eyebrow: "PLATFORM NOTICE",
+      heading: "What You Need to Know About " + topic + ", {SUBSCRIBER_FIRST_NAME}",
+      lede: "Here is a quick summary of what is happening regarding " + topic + ".",
+      bodyBlocks: [
+        "To ensure everything runs smoothly, we have outlined key steps regarding " + topic + " inside your account portal."
+      ],
+      gateBox: "Action Item: Log in to manage your account settings.",
+      checklist: [
+        { title: "Log In", desc: "Access your dashboard." }
+      ],
+      ctaText: "View My Account",
+      ctaUrl: defaultCtaUrl,
+      calloutBox: { title: "Questions?", desc: "Reply to this email with any questions." },
+      showAppBadges: true,
+      signoffHtml: defaultSignoff
+    },
+    {
+      title: "Action Item Reminder",
+      audience: isTrainer ? "trainer" : "customer",
+      subject: "Action Required: " + topic,
+      previewText: "Please review your settings regarding " + topic + ".",
+      eyebrow: "ACTION REQUIRED",
+      heading: "Action Required for " + topic + ", {SUBSCRIBER_FIRST_NAME}",
+      lede: "Please complete the necessary steps regarding " + topic + ".",
+      bodyBlocks: [
+        "Taking a moment to review " + topic + " ensures your account remains active and properly configured."
+      ],
+      gateBox: "Note: Update your profile as soon as possible.",
+      checklist: [
+        { title: "Complete Action Steps", desc: "Follow instructions inside the app." }
+      ],
+      ctaText: "Complete Setup",
+      ctaUrl: defaultCtaUrl,
+      calloutBox: { title: "Support", desc: "We are here to help." },
+      showAppBadges: true,
+      signoffHtml: defaultSignoff
+    }
+  ];
+}
+
+/**
+ * Robust URL Sanitizer to strip any markdown link syntax e.g. [https://url.com](https://url.com)
+ */
+function cleanUrl(rawUrl) {
+  if (!rawUrl) return '';
+  let str = String(rawUrl).trim();
+
+  // Extract URL from markdown link syntax [text](http://...)
+  const markdownMatch = str.match(/\[.*?\]\((https?:\/\/[^\s\)]+)\)/i);
+  if (markdownMatch && markdownMatch[1]) {
+    return markdownMatch[1];
   }
 
-  return {
-    title: "Friendly Re-engagement Digest",
-    audience: isTrainer ? "trainer" : "customer",
-    subject: `We Missed You, {SUBSCRIBER_FIRST_NAME}! See What's New at Group Fit`,
-    previewText: "Check out updated features, new coaches, and client leads waiting for you.",
-    eyebrow: "Welcome Back",
-    heading: `Ready to Pick Things Back Up, {SUBSCRIBER_FIRST_NAME}?`,
-    lede: "Your fitness journey doesn't have to pause. We've added new features and expanded our network!",
-    bodyBlocks: [
-      isTrainer
-        ? "New local clients are searching for certified trainers on Group Fit every day. Update your calendar and start connecting with active leads again."
-        : "New certified trainers have joined Group Fit in your area! Whether you want to restart your routine or try a new activity, coaches are ready."
-    ],
-    gateBox: "<strong>What's waiting for you:</strong> Log into your dashboard to check out recent updates and new matches.",
-    checklist: [
-      { title: "Review What's New", desc: "Check out newly added tools and local coach profiles." },
-      { title: "Reactivate Your Schedule", desc: "Set open availability or request custom session offers." }
-    ],
-    ctaText: "Welcome Back — Open Dashboard",
-    ctaUrl: isTrainer ? "https://portal.groupfitapp.com/login" : "https://groupfitapp.com",
-    calloutBox: { title: "Need Help?", desc: "Our support team is always here to answer your questions." },
-    showAppBadges: true,
-    signoffHtml: defaultSignoff
-  };
+  // Extract first http/https URL if embedded in brackets
+  const urlMatch = str.match(/(https?:\/\/[^\s\]\)\>"]+)/i);
+  if (urlMatch && urlMatch[1]) {
+    return urlMatch[1];
+  }
+
+  return str.replace(/[\[\]\(\)]/g, '');
+}
+
+function extractCleanTopic(promptText) {
+  if (!promptText || promptText.length < 3) return 'Group Fit Platform Update';
+
+  const text = promptText.toLowerCase();
+
+  if (text.includes('referral')) return 'Group Fit Referral Program';
+  if (text.includes('privacy') || text.includes('terms') || text.includes('t&c')) return 'Terms & Privacy Policy Update';
+  if (text.includes('calendar') || text.includes('google')) return 'Google Calendar Sync Feature';
+  if (text.includes('price') || text.includes('discount') || text.includes('free')) return 'Special Offer & Discounts';
+
+  if (promptText.length > 40) {
+    const words = promptText.split(' ').slice(0, 5).join(' ');
+    return capitalize(words) + '...';
+  }
+
+  return capitalize(promptText);
 }
 
 function capitalize(str) {

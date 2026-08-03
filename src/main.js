@@ -587,21 +587,51 @@ document.addEventListener('DOMContentLoaded', () => {
   initAiGenerator();
   initExportTxt();
 
-  // Initial load
-  setAudience('customer');
-  document.getElementById('subject').value = 'Let top trainers come to you — Introducing Trainer Preferences!';
-  document.getElementById('previewText').value = 'Set your activity, format, and trainer preferences so matching local pros can reach out directly.';
-  document.getElementById('eyebrow').value = 'New Feature Announcement';
-  document.getElementById('heading').value = 'Stop searching. Let top trainers find you, {SUBSCRIBER_FIRST_NAME}.';
-  document.getElementById('lede').value = 'Finding your ideal fitness trainer just got effortless. Set your goals once, and let matching pros bring custom training options directly to you.';
-  document.getElementById('bodyBlocks').value = 'Searching through dozens of trainer profiles to find the right fit takes time. With our brand-new Trainer Preferences feature, you no longer have to do the heavy lifting.\n\nSimply set your activity goals, preferred workout format, and trainer criteria—and certified trainers who match your profile can reach out directly with tailored session offers.';
-  document.getElementById('gateBox').value = '<strong>Where to find it:</strong> Go to <strong>Account > Trainer Preferences</strong> in your Group Fit dashboard. You are always in control and can update your preferences or opt out at any time.';
-  document.getElementById('checklist').value = `Select Trainer Preferences | Choose your preferred trainer gender (or select no preference).\nChoose Workout Format | Pick how you like to train: In-Person, Virtual, or Studio.\nPick Your Favorite Activities | Select from Swimming, Boxing, Running, Strength & Conditioning, and more.\nLet Trainers Reach Out | Qualified trainers matching your exact profile can reach out with custom training options.`;
-  document.getElementById('ctaText').value = 'Set My Trainer Preferences';
-  document.getElementById('ctaUrl').value = 'https://groupfitapp.com';
-  document.getElementById('calloutTitle').value = 'Complete Control & Privacy';
-  document.getElementById('calloutDesc').value = 'Your preferences are completely flexible. You can pause trainer matching or opt out anytime under your account settings.';
-  document.getElementById('signoffHtml').value = 'Train strong,<br /><strong>Group Fit Team</strong>';
+  function loadPreset(preset) {
+    if (preset === 'trainer_referral') {
+      setAudience('trainer');
+      document.getElementById('subject').value = 'Earn $50 + 100% session fees when you bring clients to Group Fit.';
+      document.getElementById('previewText').value = 'Your clients get their 1st session FREE with code FREE — plus you earn $50 per referral.';
+      document.getElementById('eyebrow').value = 'Referral Program';
+      document.getElementById('heading').value = 'Earn $50 + 100% fee for 50 sessions.';
+      document.getElementById('lede').value = 'Hi {SUBSCRIBER_FIRST_NAME}, your clients get their first session FREE with code <strong>FREE</strong> at checkout — and you earn $50 for each one who completes a paid session, plus 100% of your fee for their first 50 sessions.';
+      document.getElementById('bodyBlocks').value = 'Clients just sign up with your referral code. You can track signups and earnings in the <strong>Group Fit Trainer</strong> app or at <a href="https://portal.groupfitapp.com" style="color: #dc2c36; text-decoration: underline;">portal.groupfitapp.com</a>.';
+      document.getElementById('gateBox').value = '<strong>Your referral perks:</strong> $50 per referred client who completes a paid session. 100% of your session fee for their first 50 sessions. Their 1st session is free with code <strong>FREE</strong>.';
+      document.getElementById('checklist').value = `Share your referral code | Clients sign up with your code and use promo code FREE for a free first session.\nEarn $50 per client | You get $50 once they complete their first paid session.\nKeep 100% for 50 sessions | Zero platform fees for up to 50 sessions per referred client.`;
+      document.getElementById('ctaText').value = 'Track your earnings';
+      document.getElementById('ctaUrl').value = 'https://portal.groupfitapp.com';
+      document.getElementById('calloutTitle').value = '';
+      document.getElementById('calloutDesc').value = '';
+      document.getElementById('showAppBadges').value = 'false';
+      document.getElementById('signoffHtml').value = 'Train strong,<br /><strong>Group Fit Team</strong>';
+    } else if (preset === 'customer_preferences') {
+      setAudience('customer');
+      document.getElementById('subject').value = 'Let top trainers come to you — Introducing Trainer Preferences!';
+      document.getElementById('previewText').value = 'Set your activity, format, and trainer preferences so matching local pros can reach out directly.';
+      document.getElementById('eyebrow').value = 'New Feature Announcement';
+      document.getElementById('heading').value = 'Stop searching. Let top trainers find you, {SUBSCRIBER_FIRST_NAME}.';
+      document.getElementById('lede').value = 'Finding your ideal fitness trainer just got effortless. Set your goals once, and let matching pros bring custom training options directly to you.';
+      document.getElementById('bodyBlocks').value = 'Searching through dozens of trainer profiles to find the right fit takes time. With our brand-new Trainer Preferences feature, you no longer have to do the heavy lifting.\n\nSimply set your activity goals, preferred workout format, and trainer criteria—and certified trainers who match your profile can reach out directly with tailored session offers.';
+      document.getElementById('gateBox').value = '<strong>Where to find it:</strong> Go to <strong>Account > Trainer Preferences</strong> in your Group Fit dashboard. You are always in control and can update your preferences or opt out at any time.';
+      document.getElementById('checklist').value = `Select Trainer Preferences | Choose your preferred trainer gender (or select no preference).\nChoose Workout Format | Pick how you like to train: In-Person, Virtual, or Studio.\nPick Your Favorite Activities | Select from Swimming, Boxing, Running, Strength & Conditioning, and more.\nLet Trainers Reach Out | Qualified trainers matching your exact profile can reach out with custom training options.`;
+      document.getElementById('ctaText').value = 'Set My Trainer Preferences';
+      document.getElementById('ctaUrl').value = 'https://groupfitapp.com';
+      document.getElementById('calloutTitle').value = 'Complete Control & Privacy';
+      document.getElementById('calloutDesc').value = 'Your preferences are completely flexible. You can pause trainer matching or opt out anytime under your account settings.';
+      document.getElementById('signoffHtml').value = 'Train strong,<br /><strong>Group Fit Team</strong>';
+    }
+    updatePreview();
+  }
+
+  const templateTypeSelect = document.getElementById('templateType');
+  if (templateTypeSelect) {
+    templateTypeSelect.addEventListener('change', (e) => {
+      loadPreset(e.target.value);
+    });
+  }
+
+  // Initial load default to Trainer Referral preset
+  loadPreset('trainer_referral');
 
   const inputs = document.querySelectorAll('.editor-panel .form-control');
   inputs.forEach(input => {
