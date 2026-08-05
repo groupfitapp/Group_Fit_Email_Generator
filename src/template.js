@@ -103,22 +103,7 @@ export function generateTransactionalEmailHtml(data = {}) {
           <tr>
             <td class="header-row" style="padding:28px 28px 20px;border-bottom:1px solid #e2e8f0;background:transparent;text-align:center;">
               <a href="${escapeHtml(logoUrl)}" target="_blank" style="text-decoration:none;display:inline-block;">
-                <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
-                  <tr>
-                    <td style="vertical-align:middle;padding-right:10px;">
-                      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;">
-                        <rect width="32" height="32" rx="8" fill="#333399"/>
-                        <path d="M16 7L24 12V20L16 25L8 20V12L16 7Z" stroke="white" stroke-width="2.5" stroke-linejoin="round"/>
-                        <circle cx="16" cy="16" r="3.5" fill="white"/>
-                      </svg>
-                    </td>
-                    <td style="vertical-align:middle;">
-                      <div class="brand-text" style="font-size:24px;font-weight:800;letter-spacing:-0.03em;color:#0f172a;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-                        <span style="color:#333399;">Group</span> Fit
-                      </div>
-                    </td>
-                  </tr>
-                </table>
+                <img src="https://groupfitapp.com/email-assets/logo-square.png?v=2" alt="Group Fit" style="height:48px;width:auto;display:block;border:0;margin:0 auto;" />
               </a>
             </td>
           </tr>
@@ -181,14 +166,20 @@ export function generateTransactionalEmailHtml(data = {}) {
               <div>If you didnt request this booking, please notify our support team immediately.</div>
               <div style="margin-top:12px;">&copy; 2026 Group Fit. All rights reserved.</div>
               <div style="margin-top:14px;line-height:1;">
-                <a href="https://instagram.com/groupfitapp" aria-label="Instagram" style="display:inline-block;margin:0 8px;text-decoration:none;">
-                  <img src="https://cdn.simpleicons.org/instagram/333399" alt="Instagram" width="20" height="20" style="display:inline-block;border:0;outline:none;vertical-align:middle;" />
+                <a href="https://www.facebook.com/groupfitapp" target="_blank" rel="noopener" style="display:inline-block;margin:0 6px;text-decoration:none;">
+                  <img src="https://groupfitapp.com/email-assets/facebook.png" alt="Facebook" height="22" width="22" style="display:inline-block;border:0;outline:none;vertical-align:middle;" />
                 </a>
-                <a href="https://facebook.com/groupfitapp" aria-label="Facebook" style="display:inline-block;margin:0 8px;text-decoration:none;">
-                  <img src="https://cdn.simpleicons.org/facebook/333399" alt="Facebook" width="20" height="20" style="display:inline-block;border:0;outline:none;vertical-align:middle;" />
+                <a href="https://www.instagram.com/groupfit_app" target="_blank" rel="noopener" style="display:inline-block;margin:0 6px;text-decoration:none;">
+                  <img src="https://groupfitapp.com/email-assets/instagram.png" alt="Instagram" height="22" width="22" style="display:inline-block;border:0;outline:none;vertical-align:middle;" />
                 </a>
-                <a href="https://x.com/groupfitapp" aria-label="X" style="display:inline-block;margin:0 8px;text-decoration:none;">
-                  <img src="https://cdn.simpleicons.org/x/333399" alt="X" width="20" height="20" style="display:inline-block;border:0;outline:none;vertical-align:middle;" />
+                <a href="https://www.linkedin.com/company/groupfitapp" target="_blank" rel="noopener" style="display:inline-block;margin:0 6px;text-decoration:none;">
+                  <img src="https://groupfitapp.com/email-assets/linkedin.png" alt="LinkedIn" height="22" width="22" style="display:inline-block;border:0;outline:none;vertical-align:middle;" />
+                </a>
+                <a href="https://www.tiktok.com/@groupfit.app" target="_blank" rel="noopener" style="display:inline-block;margin:0 6px;text-decoration:none;">
+                  <img src="https://groupfitapp.com/email-assets/tiktok.png" alt="TikTok" height="22" width="22" style="display:inline-block;border:0;outline:none;vertical-align:middle;" />
+                </a>
+                <a href="https://www.youtube.com/@GroupFitApp" target="_blank" rel="noopener" style="display:inline-block;margin:0 6px;text-decoration:none;">
+                  <img src="https://groupfitapp.com/email-assets/youtube.png" alt="YouTube" height="22" width="22" style="display:inline-block;border:0;outline:none;vertical-align:middle;" />
                 </a>
               </div>
             </td>

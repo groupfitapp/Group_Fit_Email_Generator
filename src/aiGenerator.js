@@ -15,7 +15,8 @@ export async function generateAiEmailDrafts({ prompt, audience = 'customer', cat
         return llmDrafts;
       }
     } catch (err) {
-      console.warn('Gemini API call failed, falling back to smart engine:', err);
+      console.error('Gemini API call failed:', err);
+      throw new Error(`Gemini Live Engine Error: ${err.message || err}`);
     }
   }
 
@@ -60,15 +61,29 @@ async function fetchGeminiLlmDrafts({ prompt, audience, category, apiKey }) {
     "]\n\n" +
     "Output raw JSON ONLY. Do not wrap in markdown or code blocks.";
 
-  const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{
-        parts: [{ text: systemInstruction }]
-      }]
-    })
-  });
+  let response;
+  let retries = 3;
+  let delay = 1000;
+
+  for (let i = 0; i < retries; i++) {
+    response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + apiKey, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: systemInstruction }]
+        }]
+      })
+    });
+
+    if (response.status === 503 && i < retries - 1) {
+      console.warn(`Gemini API returned 503, retrying in ${delay}ms... (attempt ${i + 1} of ${retries})`);
+      await new Promise(res => setTimeout(res, delay));
+      delay *= 2;
+      continue;
+    }
+    break;
+  }
 
   if (!response.ok) {
     throw new Error("Gemini API error: " + response.status);
@@ -88,7 +103,7 @@ async function fetchGeminiLlmDrafts({ prompt, audience, category, apiKey }) {
   if (Array.isArray(parsed) && parsed.length > 0) {
     return parsed.map(item => ({
       ...item,
-      ctaUrl: cleanUrl(item.ctaUrl) || (isTrainer ? '[https://portal.groupfitapp.com/login](https://portal.groupfitapp.com/login)' : '[https://groupfitapp.com](https://groupfitapp.com)'),
+      ctaUrl: cleanUrl(item.ctaUrl) || (isTrainer ? 'https://portal.groupfitapp.com/login' : 'https://groupfitapp.com'),
       showAppBadges: true,
       signoffHtml: "Train strong,<br /><strong>Group Fit Team</strong>"
     }));
@@ -99,7 +114,7 @@ async function fetchGeminiLlmDrafts({ prompt, audience, category, apiKey }) {
 function generateFallbackDrafts(cleanPrompt, isTrainer, category) {
   const topic = extractCleanTopic(cleanPrompt);
   const defaultSignoff = "Train strong,<br /><strong>Group Fit Team</strong>";
-  const defaultCtaUrl = isTrainer ? "[https://portal.groupfitapp.com/login](https://portal.groupfitapp.com/login)" : "[https://groupfitapp.com](https://groupfitapp.com)";
+  const defaultCtaUrl = isTrainer ? "https://portal.groupfitapp.com/login" : "https://groupfitapp.com";
 
   // Dynamic seed so clicking the button multiple times generates new variations
   const seed = Math.floor(Math.random() * 3);

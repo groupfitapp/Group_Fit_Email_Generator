@@ -57,8 +57,10 @@ function getFormData() {
   if (appBadgesVal === 'false') showAppBadges = false;
   if (appBadgesVal === 'auto') showAppBadges = true;
 
-  const templateTypeSelect = document.getElementById('templateType');
-  const templateType = templateTypeSelect ? templateTypeSelect.value : 'transactional';
+  const emailTypeSelect = document.getElementById('emailType');
+  const emailType = emailTypeSelect ? emailTypeSelect.value : 'marketing';
+  const marketingSubtypeSelect = document.getElementById('marketingSubtype');
+  const templateType = emailType === 'transactional' ? 'transactional' : (marketingSubtypeSelect ? marketingSubtypeSelect.value : 'trainer_referral');
 
   return {
     templateType,
@@ -104,23 +106,21 @@ function applyParsedDataToForm(parsed) {
   if (parsed.audience) {
     setAudience(parsed.audience);
   }
-  if (parsed.subject) document.getElementById('subject').value = parsed.subject;
-  if (parsed.previewText) document.getElementById('previewText').value = parsed.previewText;
-  if (parsed.eyebrow) document.getElementById('eyebrow').value = parsed.eyebrow;
-  if (parsed.heading) document.getElementById('heading').value = parsed.heading;
-  if (parsed.lede) document.getElementById('lede').value = parsed.lede;
-  if (parsed.bodyBlocks && parsed.bodyBlocks.length > 0) {
-    document.getElementById('bodyBlocks').value = parsed.bodyBlocks.join('\n\n');
-  }
-  if (parsed.gateBox) document.getElementById('gateBox').value = parsed.gateBox;
-  if (parsed.checklist && parsed.checklist.length > 0) {
-    document.getElementById('checklist').value = parsed.checklist.map(c => `${c.title} | ${c.desc}`).join('\n');
-  }
-  if (parsed.ctaText) document.getElementById('ctaText').value = parsed.ctaText;
-  if (parsed.ctaUrl) document.getElementById('ctaUrl').value = parsed.ctaUrl;
-  if (parsed.calloutBox?.title) document.getElementById('calloutTitle').value = parsed.calloutBox.title;
-  if (parsed.calloutBox?.desc) document.getElementById('calloutDesc').value = parsed.calloutBox.desc;
-  if (parsed.signoffHtml) document.getElementById('signoffHtml').value = parsed.signoffHtml;
+  
+  // Set values, defaulting to empty string if field is missing or falsy in the draft
+  document.getElementById('subject').value = parsed.subject || '';
+  document.getElementById('previewText').value = parsed.previewText || '';
+  document.getElementById('eyebrow').value = parsed.eyebrow || '';
+  document.getElementById('heading').value = parsed.heading || '';
+  document.getElementById('lede').value = parsed.lede || '';
+  document.getElementById('bodyBlocks').value = (parsed.bodyBlocks && parsed.bodyBlocks.length > 0) ? parsed.bodyBlocks.join('\n\n') : '';
+  document.getElementById('gateBox').value = parsed.gateBox || '';
+  document.getElementById('checklist').value = (parsed.checklist && parsed.checklist.length > 0) ? parsed.checklist.map(c => `${c.title} | ${c.desc}`).join('\n') : '';
+  document.getElementById('ctaText').value = parsed.ctaText || '';
+  document.getElementById('ctaUrl').value = parsed.ctaUrl || '';
+  document.getElementById('calloutTitle').value = parsed.calloutBox?.title || '';
+  document.getElementById('calloutDesc').value = parsed.calloutBox?.desc || '';
+  document.getElementById('signoffHtml').value = parsed.signoffHtml || '';
 
   updatePreview();
 }
@@ -145,14 +145,32 @@ function initTabNavigation() {
 function initAudienceToggle() {
   document.querySelectorAll('.audience-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      setAudience(btn.dataset.audience);
+      const emailTypeSelect = document.getElementById('emailType');
+      if (emailTypeSelect && emailTypeSelect.value === 'marketing') {
+        if (typeof window.loadPreset === 'function') {
+          window.loadPreset(btn.dataset.audience === 'trainer' ? 'trainer_referral' : 'customer_preferences');
+        } else {
+          setAudience(btn.dataset.audience);
+        }
+      } else {
+        setAudience(btn.dataset.audience);
+      }
     });
   });
 
   const aiAudienceSelect = document.getElementById('ai-target-audience');
   if (aiAudienceSelect) {
     aiAudienceSelect.addEventListener('change', (e) => {
-      setAudience(e.target.value);
+      const emailTypeSelect = document.getElementById('emailType');
+      if (emailTypeSelect && emailTypeSelect.value === 'marketing') {
+        if (typeof window.loadPreset === 'function') {
+          window.loadPreset(e.target.value === 'trainer' ? 'trainer_referral' : 'customer_preferences');
+        } else {
+          setAudience(e.target.value);
+        }
+      } else {
+        setAudience(e.target.value);
+      }
     });
   }
 }
@@ -209,6 +227,31 @@ function initTxtImporter() {
       applyParsedDataToForm(parsed);
       switchTab('tab-editor');
       showToast('Imported text into form fields!');
+    });
+  }
+
+  const btnCopyFormat = document.getElementById('btn-copy-txt-format');
+  if (btnCopyFormat) {
+    btnCopyFormat.addEventListener('click', () => {
+      const template = `Audience: customer # Target audience (customer or trainer). Sets default links, footers and app badges
+Subject: [short email subject line]
+Preview: [preview text snippet that appears in the inbox preview]
+Eyebrow: [short 2-3 word uppercase category tag above the heading, e.g., NEW FEATURE]
+Heading: [main H1 heading of the email, e.g., Stop searching. Let top trainers find you.]
+Lede: [introductory paragraph / subtitle text right under the H1 heading]
+Body: [main content paragraphs of the email. Separate paragraphs by double linebreaks. Can include HTML links like <a href="...">text</a>]
+GateBox: [optional highlighted notice, warning, or callout banner box content]
+Checklist:
+[Title of checklist item 1] | [Description detail of checklist item 1]
+[Title of checklist item 2] | [Description detail of checklist item 2]
+CTA Text: [text displayed inside the main call-to-action button, e.g., Set My Preferences]
+CTA URL: [URL link destination for the call-to-action button]
+Callout Title: [optional gray box header title, e.g., Complete Control & Privacy]
+Callout Desc: [optional gray box details description text]
+Signoff: [email signature / sign-off HTML line, e.g., Train strong,<br /><strong>Group Fit Team</strong>]`;
+      navigator.clipboard.writeText(template).then(() => {
+        showToast('Format template with descriptions copied!');
+      });
     });
   }
 }
@@ -526,9 +569,26 @@ function initAiGenerator() {
               <span class="audience-tag ${draft.audience}">${draft.audience.toUpperCase()}</span>
             </div>
             <div class="ai-card-body">
-              <div><strong>Subject:</strong> ${draft.subject}</div>
-              <div style="margin-top: 4px;"><strong>Heading:</strong> ${draft.heading}</div>
-              <div style="margin-top: 4px;"><strong>Lede:</strong> ${draft.lede}</div>
+              <div><strong>Subject:</strong> ${draft.subject || ''}</div>
+              <div><strong>Preview:</strong> <span style="opacity: 0.85;">${draft.previewText || ''}</span></div>
+              <div><strong>Heading:</strong> ${draft.heading || ''}</div>
+              <div><strong>Lede:</strong> ${draft.lede || ''}</div>
+              <div><strong>Body Blocks:</strong>
+                <div style="margin-left: 8px; border-left: 2px solid var(--border-color); padding-left: 8px; font-style: italic; opacity: 0.85; display: flex; flex-direction: column; gap: 4px;">
+                  ${(draft.bodyBlocks || []).map(b => `<div>${b}</div>`).join('')}
+                </div>
+              </div>
+              ${draft.gateBox ? `<div><strong>Gate Box:</strong> <span style="opacity: 0.85;">${draft.gateBox}</span></div>` : ''}
+              ${draft.checklist && draft.checklist.length > 0 ? `
+                <div><strong>Checklist:</strong>
+                  <ul style="margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 2px;">
+                    ${draft.checklist.map(c => `<li><strong>${c.title}:</strong> ${c.desc}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+              ${draft.calloutBox?.title || draft.calloutBox?.desc ? `
+                <div><strong>Callout Box:</strong> <span style="opacity: 0.85;">${draft.calloutBox.title || ''} - ${draft.calloutBox.desc || ''}</span></div>
+              ` : ''}
             </div>
             <div class="ai-card-actions">
               <button class="btn btn-primary btn-approve-draft">
@@ -550,7 +610,7 @@ function initAiGenerator() {
         showToast(apiKey ? `✨ Generated 3 live Gemini Pro AI drafts using your saved API Key!` : `Generated 3 AI email drafts for ${targetAudience.toUpperCase()}`);
       } catch (err) {
         console.error('Failed to generate drafts:', err);
-        showToast('Generation error. Falling back to built-in templates.');
+        showToast(`Generation error: ${err.message}`);
       } finally {
         btnGenerate.disabled = false;
         btnGenerate.innerHTML = '<span>✨ Generate Gemini AI Drafts</span>';
@@ -619,19 +679,52 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('calloutTitle').value = 'Complete Control & Privacy';
       document.getElementById('calloutDesc').value = 'Your preferences are completely flexible. You can pause trainer matching or opt out anytime under your account settings.';
       document.getElementById('signoffHtml').value = 'Train strong,<br /><strong>Group Fit Team</strong>';
+    } else if (preset === 'transactional') {
+      setAudience('customer');
+      document.getElementById('subject').value = 'Your Booking is Confirmed - Group Fit';
+      document.getElementById('previewText').value = 'Great news! Your session booking has been confirmed.';
+      document.getElementById('eyebrow').value = '';
+      document.getElementById('heading').value = '';
+      document.getElementById('lede').value = '';
+      document.getElementById('bodyBlocks').value = '';
+      document.getElementById('gateBox').value = '';
+      document.getElementById('checklist').value = '';
+      document.getElementById('ctaText').value = 'View Booking Details';
+      document.getElementById('ctaUrl').value = 'https://portal.groupfitapp.com/bookings/BK-104928';
+      document.getElementById('calloutTitle').value = '';
+      document.getElementById('calloutDesc').value = '';
+      document.getElementById('showAppBadges').value = 'auto';
+      document.getElementById('signoffHtml').value = '';
     }
+    window.loadPreset = loadPreset;
     updatePreview();
   }
 
-  const templateTypeSelect = document.getElementById('templateType');
-  if (templateTypeSelect) {
-    templateTypeSelect.addEventListener('change', (e) => {
-      loadPreset(e.target.value);
-    });
+  const emailTypeSelect = document.getElementById('emailType');
+
+  function handleTypeChange() {
+    if (!emailTypeSelect) return;
+    const emailType = emailTypeSelect.value;
+    const audienceBanner = document.querySelector('.audience-banner');
+    if (emailType === 'marketing') {
+      if (audienceBanner) audienceBanner.style.display = 'flex';
+      
+      // Load preset based on the currently selected audience button
+      const activeAudienceBtn = document.querySelector('.audience-btn.active');
+      const audience = activeAudienceBtn ? activeAudienceBtn.dataset.audience : 'trainer';
+      loadPreset(audience === 'trainer' ? 'trainer_referral' : 'customer_preferences');
+    } else {
+      if (audienceBanner) audienceBanner.style.display = 'none';
+      loadPreset('transactional');
+    }
   }
 
-  // Initial load default to Trainer Referral preset
-  loadPreset('trainer_referral');
+  if (emailTypeSelect) {
+    emailTypeSelect.addEventListener('change', handleTypeChange);
+  }
+
+  // Initial load
+  handleTypeChange();
 
   const inputs = document.querySelectorAll('.editor-panel .form-control');
   inputs.forEach(input => {
